@@ -11,7 +11,7 @@ The implementation is rather naive and I am sure it can be significiantly improv
 
 ## Video
 
-<video src="https://raw.githubusercontent.com/arnoldfolarin/lead-automation-engine/main/docs/assets/demo-walkthrough.mp4" controls width="720"></video>
+https://github.com/arnoldfolarin/lead-automation-engine/releases/download/demo-walkthrough/demo-walkthrough.mp4
 
 ## Motivation
 
