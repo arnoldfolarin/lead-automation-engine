@@ -9,9 +9,9 @@ The implementation is rather naive and I am sure it can be significiantly improv
 **Live app:** https://tech-jump-outreach.web.app/login.html  
 (Sign-in requires a Google account on the allowed domain.)
 
-<video src="docs/assets/demo-walkthrough.mp4" controls width="720">
-  <a href="docs/assets/demo-walkthrough.mp4">Download demo video</a>
-</video>
+## Video
+
+<video src="https://raw.githubusercontent.com/arnoldfolarin/lead-automation-engine/main/docs/assets/demo-walkthrough.mp4" controls width="720"></video>
 
 ## Motivation
 
