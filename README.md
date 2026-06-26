@@ -165,4 +165,4 @@ All required keys are listed in [.env.example](.env.example). Never commit real 
 
 ## License
 
-Private internship project. Contact the author for usage questions.
+Private internship project. 
