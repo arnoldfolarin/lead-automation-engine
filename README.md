@@ -4,6 +4,15 @@ AI-powered B2B lead automation platform built solo during a software engineering
 
 The implementation is rather naive and I am sure it can be significiantly improved. Any contributions or suggestions are welcome :)
 
+## Demo
+
+**Live app:** https://tech-jump-outreach.web.app/login.html  
+(Sign-in requires a Google account on the allowed domain.)
+
+<video src="docs/assets/demo-walkthrough.mp4" controls width="720">
+  <a href="docs/assets/demo-walkthrough.mp4">Download demo video</a>
+</video>
+
 ## Motivation
 
 Manual cold outreach does not scale. Sales teams need a system that can accept leads from multiple sources, draft context-aware messages, send on a schedule, and stop when a prospect replies. This project automates that loop while keeping human review in the loop for inbound replies and AI-generated drafts.
