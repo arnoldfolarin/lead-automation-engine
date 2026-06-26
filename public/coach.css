@@ -1,0 +1,359 @@
+/* TJ Coach — bottom-right help widget */
+.tj-coach-wrap {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+/* ── Bubble button ───────────────────────────────────────────── */
+.tj-coach-btn-wrap {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  animation: tj-coach-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s both;
+}
+@keyframes tj-coach-pop {
+  from { transform: scale(0.55); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* One-shot ripples — DOM nodes removed on animationend */
+.tj-coach-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(59, 130, 246, 0.45);
+  pointer-events: none;
+  animation: tj-coach-ripple 1.6s ease-out forwards;
+}
+.tj-coach-ripple--delay {
+  animation-delay: 0.55s;
+}
+@keyframes tj-coach-ripple {
+  0%   { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
+.tj-coach-btn {
+  position: relative;
+  z-index: 1;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent, #3b82f6);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;
+}
+.tj-coach-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 28px rgba(59, 130, 246, 0.6), 0 3px 10px rgba(0, 0, 0, 0.35);
+}
+.tj-coach-btn:active {
+  transform: scale(0.97);
+}
+.tj-coach-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke: #fff;
+}
+
+/* ── Panel ───────────────────────────────────────────────────── */
+.tj-coach-panel {
+  width: 320px;
+  max-height: 420px;
+  background: var(--surface, #151d2e);
+  border: 1px solid var(--border, #2a3548);
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 2px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1);
+  pointer-events: none;
+}
+.tj-coach-panel[hidden] {
+  display: none !important;
+}
+.tj-coach-panel.tj-coach-panel--open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+html[data-theme="light"] .tj-coach-panel {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.tj-coach-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border, #2a3548);
+  flex-shrink: 0;
+}
+.tj-coach-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text, #e8edf5);
+  letter-spacing: 0.01em;
+}
+.tj-coach-close {
+  background: none;
+  border: none;
+  color: var(--muted, #8b9cb3);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+  transition: color 0.15s;
+}
+.tj-coach-close:hover {
+  color: var(--text, #e8edf5);
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+.tj-coach-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Messages ────────────────────────────────────────────────── */
+.tj-coach-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  scroll-behavior: smooth;
+}
+.tj-coach-msgs::-webkit-scrollbar {
+  width: 4px;
+}
+.tj-coach-msgs::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tj-coach-msgs::-webkit-scrollbar-thumb {
+  background: var(--border, #2a3548);
+  border-radius: 2px;
+}
+
+.tj-coach-msg {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  max-width: 90%;
+  animation: tj-msg-in 0.2s ease-out;
+}
+@keyframes tj-msg-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tj-coach-msg--bot {
+  background: var(--hover-surface, rgba(255,255,255,0.04));
+  border: 1px solid var(--border, #2a3548);
+  color: var(--text, #e8edf5);
+  align-self: flex-start;
+}
+.tj-coach-msg--user {
+  background: var(--accent, #3b82f6);
+  color: #fff;
+  align-self: flex-end;
+  border: none;
+}
+.tj-coach-msg--bot a,
+.tj-coach-msg a.tj-coach-link {
+  color: var(--accent, #3b82f6);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+.tj-coach-msg--bot a:hover,
+.tj-coach-msg a.tj-coach-link:hover {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+.tj-coach-msg a {
+  color: var(--accent, #3b82f6);
+  text-decoration: underline;
+  font-weight: 600;
+}
+.tj-coach-msg--user a {
+  color: #fff;
+  text-decoration: underline;
+}
+.tj-coach-msg strong {
+  font-weight: 700;
+}
+.tj-coach-msg code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.78em;
+  background: var(--code-bg, rgba(0,0,0,0.3));
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* Typing indicator */
+.tj-coach-msg--typing {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  padding: 0.65rem 0.85rem;
+}
+.tj-coach-typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted, #94a3b8);
+  animation: tj-coach-typing 1.2s ease-in-out infinite;
+}
+.tj-coach-typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.tj-coach-typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes tj-coach-typing {
+  0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+
+.tj-coach-send:disabled,
+.tj-coach-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Quick-tip chips ─────────────────────────────────────────── */
+.tj-coach-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 1rem 0.6rem;
+  flex-shrink: 0;
+}
+.tj-coach-chip {
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--border, #2a3548);
+  color: var(--muted, #8b9cb3);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.tj-coach-chip:hover {
+  border-color: var(--accent, #3b82f6);
+  color: var(--accent, #3b82f6);
+  background: var(--nav-hover, rgba(59,130,246,0.08));
+}
+
+/* ── Input row ───────────────────────────────────────────────── */
+.tj-coach-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+  border-top: 1px solid var(--border, #2a3548);
+  flex-shrink: 0;
+}
+.tj-coach-input {
+  flex: 1;
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 0.82rem;
+  background: var(--bg, #0c1222);
+  border: 1px solid var(--border, #2a3548);
+  color: var(--text, #e8edf5);
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 0;
+}
+.tj-coach-input:focus {
+  border-color: var(--accent, #3b82f6);
+}
+.tj-coach-input::placeholder {
+  color: var(--muted, #8b9cb3);
+}
+.tj-coach-send {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: var(--accent, #3b82f6);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.12s;
+}
+.tj-coach-send:hover {
+  background: var(--accent-dim, #1d4ed8);
+}
+.tj-coach-send:active {
+  transform: scale(0.93);
+}
+.tj-coach-send svg {
+  width: 14px;
+  height: 14px;
+  stroke: #fff;
+}
+
+/* ── Light theme overrides ───────────────────────────────────── */
+html[data-theme="light"] .tj-coach-input {
+  background: var(--surface, #fff);
+}
+html[data-theme="light"] .tj-coach-msg--bot {
+  background: var(--hover-surface, rgba(15,23,42,0.06));
+}
+
+/* ── Mobile ──────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .tj-coach-wrap {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  .tj-coach-panel {
+    width: calc(100vw - 2rem);
+    max-height: 360px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tj-coach-btn-wrap,
+  .tj-coach-ripple,
+  .tj-coach-panel {
+    animation: none !important;
+    transition: none !important;
+  }
+  .tj-coach-ripple {
+    display: none;
+  }
+}

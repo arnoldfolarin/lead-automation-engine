@@ -1,0 +1,3091 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Campaigns — Tech Jump</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/shell.css" />
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script>
+      try {             // try and edit code for theme
+        // set up local storage and variables
+        var k = "tech_jump_theme";
+        var v = localStorage.getItem(k);
+        document.documentElement.setAttribute("data-theme", v === "light" ? "light" : "dark");
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    </script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "DM Sans", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .gradient-bg {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(ellipse 80% 50% at 50% -20%, var(--glow), transparent),
+          radial-gradient(ellipse 60% 40% at 100% 50%, var(--green-tint), transparent);
+        pointer-events: none;
+        z-index: 0;
+      }
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 3rem;
+      }
+      h1 {
+        font-size: clamp(1.35rem, 3vw, 1.75rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin: 0 0 0.25rem;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0 0 1.5rem;
+      }
+      .top-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.5rem;
+      }
+      .btn-primary {
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 1.35rem;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        border: none;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .btn-primary:hover {
+        background: var(--accent-dim);
+      }
+      .btn-secondary {
+        font-family: inherit;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--muted);
+        background: transparent;
+        border: 1px solid var(--border);
+        padding: 0.35rem 0.65rem;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .btn-secondary:hover {
+        color: var(--text);
+        border-color: var(--muted);
+      }
+      .sign-in-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem 1.35rem;
+        max-width: 28rem;
+      }
+      .btn-google {
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        background: var(--accent);
+        border: none;
+        padding: 0.65rem 1.15rem;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .sign-in-note {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin: 0 0 1rem;
+      }
+      .link-quiet {
+        color: var(--accent);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .link-quiet:hover {
+        text-decoration: underline;
+      }
+
+      .modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 200;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .modal-backdrop.open {
+        display: flex;
+      }
+      @media (min-width: 600px) {
+        .modal-backdrop {
+          align-items: center;
+        }
+      }
+      .modal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 520px;
+        max-height: min(92vh, 640px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      }
+      .modal-head {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+      .modal-head h2 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+      .step-dots {
+        font-size: 0.7rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .modal-body {
+        padding: 1.1rem 1.25rem 1.25rem;
+        overflow-y: auto;
+        flex: 1;
+      }
+      label {
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+      input[type="text"],
+      input[type="email"],
+      textarea {
+        width: 100%;
+        font-family: inherit;
+        font-size: 0.875rem;
+        padding: 0.55rem 0.65rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.2);
+        color: var(--text);
+        margin-bottom: 0.9rem;
+      }
+      textarea {
+        min-height: 88px;
+        resize: vertical;
+      }
+      .btn-row {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+      }
+      .btn {
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 0.55rem 1rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn-solid {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-solid:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .wizard-step[hidden] {
+        display: none !important;
+      }
+      .err-text {
+        color: var(--danger-text);
+        font-size: 0.85rem;
+        margin: 0 0 0.75rem;
+      }
+      .lead-card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.75rem;
+        margin-bottom: 0.65rem;
+        background: rgba(0, 0, 0, 0.12);
+      }
+      .lead-card h4 {
+        margin: 0 0 0.35rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+      .lead-meta {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+      }
+      .lead-card textarea {
+        min-height: 56px;
+        margin-bottom: 0.4rem;
+        font-size: 0.8rem;
+      }
+      .lead-card input[type="text"] {
+        margin-bottom: 0.4rem;
+        font-size: 0.8rem;
+      }
+      .chk-send {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.78rem;
+        margin-top: 0.35rem;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+      .info-banner {
+        font-size: 0.82rem;
+        color: var(--muted);
+        background: rgba(59, 130, 246, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.28);
+        border-radius: 10px;
+        padding: 0.65rem 0.85rem;
+        margin-bottom: 1rem;
+        line-height: 1.45;
+      }
+      .mode-pick {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+        margin-bottom: 1rem;
+      }
+      @media (max-width: 480px) {
+        .mode-pick {
+          grid-template-columns: 1fr;
+        }
+      }
+      .mode-card {
+        font-family: inherit;
+        text-align: left;
+        padding: 0.75rem 0.85rem;
+        border-radius: 10px;
+        border: 2px solid var(--border);
+        background: rgba(0, 0, 0, 0.15);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 0.8rem;
+        line-height: 1.35;
+      }
+      .mode-card strong {
+        display: block;
+        font-size: 0.88rem;
+        margin-bottom: 0.25rem;
+      }
+      .mode-card:hover {
+        border-color: var(--muted);
+      }
+      .mode-card.selected {
+        border-color: var(--accent);
+        background: rgba(59, 130, 246, 0.12);
+      }
+      .btn-text {
+        font-family: inherit;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--accent);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        margin-bottom: 0.75rem;
+        text-decoration: underline;
+      }
+      .lead-hints {
+        font-size: 0.72rem;
+        color: #eab308;
+        background: rgba(234, 179, 8, 0.1);
+        border: 1px solid rgba(234, 179, 8, 0.25);
+        border-radius: 8px;
+        padding: 0.45rem 0.55rem;
+        margin: 0 0 0.5rem;
+        line-height: 1.4;
+      }
+      .lead-list--manual .f-one-wrap {
+        display: none;
+      }
+      body.campaigns-page .wrap {
+        max-width: min(1100px, calc(100% - 1.5rem));
+      }
+      .outreach-bubbles {
+        margin-top: 1.5rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1rem 1rem 1.15rem;
+        position: relative;
+      }
+      .outreach-bubbles h2 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+      .bubble-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .bubble-count {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+      .bubble-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem 0.85rem;
+        font-size: 0.68rem;
+        color: var(--muted);
+        margin-bottom: 0.6rem;
+      }
+      .bubble-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .bubble-legend i {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .bubble-leg-not_sent {
+        background: #3b82f6;
+      }
+      .bubble-leg-no_reply {
+        background: #ef4444;
+      }
+      .bubble-leg-replied {
+        background: #eab308;
+      }
+      .bubble-leg-booked {
+        background: #22c55e;
+      }
+      #bubble-chart-wrap {
+        position: relative;
+        width: 100%;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.22);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 0.75rem 1.25rem;
+      }
+      .outreach-bubbles--donut #bubble-chart-wrap {
+        min-height: 280px;
+      }
+      .outreach-bubbles--sparse {
+        padding-bottom: 0.85rem;
+      }
+      .outreach-bubbles--sparse .bubble-legend {
+        display: none;
+      }
+      html[data-theme="light"] #bubble-chart-wrap {
+        background: rgba(15, 23, 42, 0.05);
+      }
+      .bubble-donut-svg {
+        width: min(100%, 340px);
+        height: auto;
+        max-height: 320px;
+        display: block;
+        filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.35));
+      }
+      .bubble-donut-slice {
+        cursor: pointer;
+        stroke: rgba(255, 255, 255, 0.55);
+        stroke-width: 2.5;
+        transition: filter 0.15s ease, stroke-width 0.15s ease;
+      }
+      .bubble-donut-slice:hover {
+        filter: brightness(1.14) saturate(1.12);
+        stroke: rgba(255, 255, 255, 0.95);
+        stroke-width: 3.5;
+      }
+      .bubble-donut-slice:focus {
+        outline: none;
+      }
+      .bubble-donut-center-text {
+        font-family: "DM Sans", system-ui, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        fill: rgba(255, 255, 255, 0.95);
+        pointer-events: none;
+      }
+      .bubble-donut-center-sub {
+        font-family: "DM Sans", system-ui, sans-serif;
+        font-size: 7px;
+        font-weight: 600;
+        fill: rgba(255, 255, 255, 0.55);
+        pointer-events: none;
+      }
+      .bubble-donut-hint {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.62rem;
+        color: rgba(255, 255, 255, 0.28);
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      #bubble-tooltip {
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 220px;
+        padding: 0.6rem 0.75rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.12s ease, transform 0.12s ease;
+      }
+      #bubble-tooltip.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      #bubble-tooltip .tip-name {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #bubble-tooltip .tip-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.74rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+      #bubble-tooltip .tip-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      #bubble-tooltip .tip-line {
+        color: var(--muted);
+        font-size: 0.72rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #bubble-tooltip .tip-cta {
+        margin-top: 0.4rem;
+        padding-top: 0.35rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.7rem;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .bubble-empty,
+      .bubble-err {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin: 0.35rem 0 0;
+        padding: 0.5rem 0;
+      }
+      .bubble-empty-state {
+        text-align: center;
+        padding: 0.85rem 0.75rem 0.75rem;
+      }
+      .bubble-empty-state p {
+        margin: 0 0 0.65rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+      .bubble-empty-dots {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem 0.75rem;
+        justify-content: center;
+        margin: 0 0 0.75rem;
+        font-size: 0.68rem;
+        color: var(--muted);
+        opacity: 0.75;
+      }
+      .bubble-empty-dots span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+      .bubble-empty-dots i {
+        width: 0.42rem;
+        height: 0.42rem;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .bubble-empty-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+      }
+      .bubble-empty-actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.45rem 0.85rem;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid var(--border);
+        background: var(--hover-surface);
+        color: var(--text);
+      }
+      .bubble-empty-actions a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .bubble-empty-actions a.bubble-empty-actions__primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .bubble-empty-actions a.bubble-empty-actions__primary:hover {
+        filter: brightness(1.08);
+        color: #fff;
+      }
+      #bubble-compact-wrap {
+        display: none;
+        width: 100%;
+      }
+      #bubble-compact-wrap.visible {
+        display: block;
+      }
+      .bubble-compact-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 1rem 1.15rem 1rem 1.35rem;
+        overflow: hidden;
+      }
+      html[data-theme="light"] .bubble-compact-card {
+        background: rgba(15, 23, 42, 0.05);
+        border-color: var(--border);
+      }
+      .bubble-compact-card__rail {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        border-radius: 14px 0 0 14px;
+      }
+      .bubble-compact-card__body {
+        flex: 1;
+        min-width: 0;
+      }
+      .bubble-compact-card__head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+      .bubble-compact-card__name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      .bubble-compact-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      html[data-theme="light"] .bubble-compact-status {
+        background: rgba(15, 23, 42, 0.04);
+        border-color: var(--border);
+      }
+      .bubble-compact-status i {
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .bubble-compact-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.45rem 1rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-bottom: 0.85rem;
+        line-height: 1.45;
+      }
+      @media (max-width: 560px) {
+        .bubble-compact-meta {
+          grid-template-columns: 1fr;
+        }
+      }
+      .bubble-compact-meta strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .bubble-compact-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: auto;
+        padding-top: 0.65rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      html[data-theme="light"] .bubble-compact-actions {
+        border-top-color: var(--border);
+      }
+      .bubble-compact-actions button,
+      .bubble-compact-actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.42rem 0.8rem;
+        border-radius: 8px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: var(--hover-surface);
+        color: var(--text);
+      }
+      .bubble-compact-actions button:hover,
+      .bubble-compact-actions a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .bubble-compact-actions .bubble-compact-actions__primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .bubble-compact-actions .bubble-compact-actions__primary:hover {
+        filter: brightness(1.08);
+        color: #fff;
+      }
+      .bubble-err {
+        color: #f87171;
+      }
+      .campaign-twin-tables {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1.25rem;
+        align-items: stretch;
+      }
+      @media (max-width: 800px) {
+        .campaign-twin-tables {
+          grid-template-columns: 1fr;
+        }
+      }
+      .campaign-table-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 0.85rem 1rem 1rem;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      .campaign-table-card__head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.35rem 0.75rem;
+        margin-bottom: 0.25rem;
+      }
+      .campaign-table-card__head h3 {
+        margin: 0;
+        font-size: 0.88rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+      .campaign-table-card__meta {
+        font-size: 0.72rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .campaign-table-card__sub {
+        font-size: 0.76rem;
+        line-height: 1.45;
+        margin: 0 0 0.55rem;
+      }
+      .campaign-table-card__sub code {
+        font-size: 0.7em;
+      }
+      .camp-table-err {
+        font-size: 0.78rem;
+        color: #f87171;
+        margin: 0 0 0.45rem;
+      }
+      .camp-table-scroll {
+        max-height: 280px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        background: rgba(0, 0, 0, 0.12);
+      }
+      html[data-theme="light"] .camp-table-scroll {
+        background: rgba(255, 255, 255, 0.5);
+      }
+      .camp-mini-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+      }
+      .camp-mini-table th,
+      .camp-mini-table td {
+        padding: 0.4rem 0.55rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      .camp-mini-table th {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        font-weight: 700;
+        position: sticky;
+        top: 0;
+        background: var(--surface);
+        z-index: 1;
+      }
+      .camp-mini-table tr:last-child td {
+        border-bottom: none;
+      }
+      .camp-mini-table .camp-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        margin-right: 0.35rem;
+        vertical-align: 0.05em;
+      }
+      .camp-mini-table a {
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .camp-mini-table a:hover {
+        text-decoration: underline;
+      }
+      .camp-table-footnote {
+        font-size: 0.68rem;
+        color: var(--muted);
+        margin: 0 0 0.45rem;
+      }
+      .camp-table-empty {
+        font-size: 0.78rem;
+        margin: 0.25rem 0 0.5rem;
+      }
+      .campaign-table-card > .link-quiet {
+        font-size: 0.8rem;
+        margin-top: auto;
+      }
+      .modal--start .modal,
+      .modal--import .modal {
+        max-width: 440px;
+      }
+      .start-pick {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        margin: 0.5rem 0 0;
+      }
+      .start-pick button {
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+        text-align: left;
+      }
+      .start-pick button:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .start-pick button.primary {
+        background: var(--accent);
+        color: #fff;
+        border-color: transparent;
+      }
+      .start-pick button.primary:hover {
+        filter: brightness(1.05);
+        color: #fff;
+      }
+      .import-field {
+        margin-bottom: 0.75rem;
+      }
+      .import-field > label:not(.import-drop-zone) {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+      .import-drop-zone {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 1.4rem 1rem;
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        background: rgba(59, 130, 246, 0.04);
+        color: var(--muted);
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        text-align: center;
+      }
+      .import-drop-zone:hover,
+      .import-drop-zone.drag-over {
+        border-color: var(--accent);
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent);
+      }
+      .import-drop-zone.drag-over {
+        border-style: solid;
+      }
+      .drop-zone-text {
+        font-size: 0.84rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .import-drop-zone.drag-over .drop-zone-text,
+      .import-drop-zone.has-file .drop-zone-text { color: var(--accent); }
+      .drop-zone-sub {
+        font-size: 0.7rem;
+        color: var(--muted);
+      }
+      .import-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .import-options label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.82rem;
+        text-transform: none;
+        letter-spacing: normal;
+        font-weight: 500;
+        color: var(--text);
+        cursor: pointer;
+      }
+      .tj-mascot-scene {
+        text-align: center;
+        padding: 1.25rem 0.5rem 0.75rem;
+      }
+      .tj-mascot-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        max-width: 220px;
+        margin: 0 auto 0.75rem;
+        min-height: 56px;
+        position: relative;
+      }
+      .tj-mascot {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #3b82f6, #22c55e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 800;
+        font-size: 0.95rem;
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+        animation: tjMascotBob 1.2s ease-in-out infinite;
+      }
+      .tj-mascot-eyes {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 5px;
+      }
+      .tj-eye {
+        width: 5px;
+        height: 5px;
+        background: #fff;
+        border-radius: 50%;
+        animation: tjEyeLook 2.5s ease-in-out infinite;
+      }
+      .tj-eye:last-child {
+        animation-delay: 0.08s;
+      }
+      @keyframes tjMascotBob {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-4px);
+        }
+      }
+      @keyframes tjEyeLook {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(2px);
+        }
+        75% {
+          transform: translateX(-2px);
+        }
+      }
+      .tj-file-float {
+        font-size: 1.75rem;
+        animation: tjFileMove 1.8s ease-in-out infinite;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+      }
+      @keyframes tjFileMove {
+        0% {
+          transform: translate(0, 0) scale(1);
+          opacity: 0.85;
+        }
+        50% {
+          transform: translate(-72px, -6px) scale(1.05);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(0, 0) scale(1);
+          opacity: 0.85;
+        }
+      }
+      .import-preview-wrap {
+        max-height: 220px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-top: 0.5rem;
+        font-size: 0.72rem;
+      }
+      .import-preview-wrap table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .import-preview-wrap th,
+      .import-preview-wrap td {
+        padding: 0.35rem 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      .import-preview-wrap th {
+        position: sticky;
+        top: 0;
+        background: var(--surface);
+        color: var(--muted);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+      }
+      .import-warn {
+        color: #eab308;
+        font-size: 0.68rem;
+      }
+    </style>
+  </head>
+  <body class="campaigns-page">
+    <div class="gradient-bg" aria-hidden="true"></div>
+
+    <div id="auth-loading-root" class="wrap">
+      <div class="sign-in-card">
+        <p role="status">Checking session…</p>
+      </div>
+    </div>
+
+    <div id="app-root" class="wrap" hidden>
+      <div class="top-row">
+        <div>
+          <h1>Campaigns</h1>
+          <p class="sub">New campaign</p>
+        </div>
+        <button type="button" class="btn-primary" id="btnNewCampaign" aria-label="New campaign">+</button>
+      </div>
+      <p class="muted" style="max-width: 56ch; line-height: 1.45">
+        <a class="link-quiet" href="/leads.html?view=pipeline">Pipeline</a>
+        · <a class="link-quiet" href="/email.html">Send email</a>
+        — turn on AI follow-ups with <strong>review before send</strong>, then approve drafts on Pipeline when they appear.
+      </p>
+      <p class="muted" style="max-width: 56ch; line-height: 1.45; font-size: 0.85rem; margin-top: -0.5rem">
+        <label style="cursor: pointer; user-select: none">
+          <input type="checkbox" id="tjNotifOptInCampaigns" />
+          Enable in-app notifications on Pipeline — same Firestore pref as <strong>leads.html</strong> for this tenant (<code>leadsDashboardTenantId</code>).
+        </label>
+      </p>
+
+      <section class="outreach-bubbles" aria-labelledby="bubble-heading">
+        <div class="bubble-head">
+          <h2 id="bubble-heading">Outreach at a glance</h2>
+          <span class="bubble-count" id="bubbleCount" aria-live="polite"></span>
+        </div>
+        <div class="bubble-legend" id="bubbleLegend" aria-hidden="true">
+          <span><i class="bubble-leg-not_sent"></i> No send yet</span>
+          <span><i class="bubble-leg-no_reply"></i> No reply</span>
+          <span><i class="bubble-leg-replied"></i> Replied</span>
+          <span><i class="bubble-leg-booked"></i> Meeting booked</span>
+        </div>
+        <p class="bubble-err" id="bubbleErr" hidden></p>
+        <div id="bubble-chart-wrap" hidden>
+          <svg
+            id="bubble-donut-svg"
+            class="bubble-donut-svg"
+            viewBox="0 0 200 200"
+            role="list"
+            aria-label="One ring — each slice is a company; color shows pipeline status. Click to open Pipeline."
+          ></svg>
+          <div class="bubble-donut-hint" aria-hidden="true">click a slice → Pipeline</div>
+        </div>
+        <div id="bubble-compact-wrap" hidden>
+          <div class="bubble-compact-card" id="bubbleCompactCard"></div>
+        </div>
+        <div class="bubble-empty-state" id="bubbleEmpty" hidden>
+          <div class="bubble-empty-dots" aria-hidden="true">
+            <span><i class="bubble-leg-not_sent"></i> No send yet</span>
+            <span><i class="bubble-leg-no_reply"></i> No reply</span>
+            <span><i class="bubble-leg-replied"></i> Replied</span>
+            <span><i class="bubble-leg-booked"></i> Meeting booked</span>
+          </div>
+          <p>No companies in outreach yet — add contacts on Pipeline or send your first email.</p>
+          <div class="bubble-empty-actions">
+            <a class="bubble-empty-actions__primary" id="bubbleEmptyPipelineLink" href="/leads.html?view=pipeline">Add on Pipeline</a>
+            <a href="/email.html" id="bubbleEmptyEmailLink">Send email</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="campaign-twin-tables" aria-label="Inbound leads and outreach targets">
+        <div class="campaign-table-card" id="campCardInbound">
+          <div class="campaign-table-card__head">
+            <h3>Inbound leads</h3>
+            <span class="campaign-table-card__meta" id="campInboundMeta" aria-live="polite"></span>
+          </div>
+          <p class="muted campaign-table-card__sub">
+            People from ads, Meta, and forms — stored as <code>leads</code>. Separate from outreach; full sheet lives on
+            Pipeline.
+          </p>
+          <p class="camp-table-err" id="campInboundErr" hidden></p>
+          <div class="camp-table-scroll" id="campInboundScroll" hidden>
+            <table class="camp-mini-table" aria-label="Inbound leads preview">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="campInboundTbody"></tbody>
+            </table>
+          </div>
+          <p class="camp-table-empty muted" id="campInboundEmpty" hidden>No inbound leads for this tenant yet.</p>
+          <p class="camp-table-footnote" id="campInboundMore" hidden></p>
+          <a class="link-quiet" id="campInboundPipelineLink" href="/leads.html?view=pipeline">Inbound table on Pipeline →</a>
+        </div>
+        <div class="campaign-table-card" id="campCardOutreach">
+          <div class="campaign-table-card__head">
+            <h3>Outreach targets</h3>
+            <span class="campaign-table-card__meta" id="campOutreachMeta" aria-live="polite"></span>
+          </div>
+          <p class="muted campaign-table-card__sub" id="campOutreachSub">
+            Same list as the ring — blue slices are still <strong>no send yet</strong> (good candidates for
+            <a class="link-quiet" href="/email.html">Send email</a>). Stored as <code>targets</code>.
+          </p>
+          <p class="camp-table-err" id="campOutreachErr" hidden></p>
+          <div class="camp-table-scroll" id="campOutreachScroll" hidden>
+            <table class="camp-mini-table" aria-label="Outreach targets preview">
+              <thead>
+                <tr>
+                  <th>Company</th>
+                  <th>Email</th>
+                  <th>Pipeline</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="campOutreachTbody"></tbody>
+            </table>
+          </div>
+          <p class="camp-table-empty muted" id="campOutreachEmpty" hidden>No outreach companies yet — import or add on Pipeline.</p>
+          <p class="camp-table-footnote" id="campOutreachMore" hidden></p>
+          <a class="link-quiet" id="campOutreachPipelineLink" href="/leads.html?view=pipeline">Outreach grid on Pipeline →</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="bubble-tooltip" aria-hidden="true"></div>
+
+    <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true">
+      <div class="modal" role="dialog" aria-labelledby="modal-title">
+        <div class="modal-head">
+          <h2 id="modal-title">New campaign</h2>
+          <span class="step-dots" id="stepDots">1 / 4</span>
+          <button type="button" class="btn-secondary" id="btnCloseModal">Close</button>
+        </div>
+        <div class="modal-body">
+          <p class="err-text" id="wizardErr" hidden></p>
+
+          <div class="wizard-step" data-step="1">
+            <label for="campName">Campaign name</label>
+            <input type="text" id="campName" placeholder="e.g. Orlando Q2" autocomplete="off" />
+            <div class="btn-row">
+              <button type="button" class="btn btn-solid" id="btnStep1Next">Next</button>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="2" hidden>
+            <p class="info-banner" id="step2ModeHint">
+              How do you want to write this campaign?
+            </p>
+            <div class="mode-pick" role="group" aria-label="Campaign writing mode">
+              <button type="button" class="mode-card selected" id="modeAi" data-mode="ai">
+                <strong>AI-assisted</strong>
+                Upload a CSV in the next step. We’ll pull company sites when possible and draft one-liners + emails.
+              </button>
+              <button type="button" class="mode-card" id="modeLuke" data-mode="manual">
+                <strong>Write it yourself</strong>
+                You write the subject and message. Same copy goes to every recipient — edit individual rows before sending if needed.
+              </button>
+            </div>
+            <button type="button" class="btn-text" id="btnLukeTemplate">
+              Use Tech Jump outreach template
+            </button>
+            <label for="kickSubject">Subject line</label>
+            <input type="text" id="kickSubject" placeholder="e.g. Partnership opportunity — Tech Jump" />
+            <label for="kickBody">Message</label>
+            <textarea id="kickBody" placeholder="Your outreach email…"></textarea>
+            <p class="muted" id="step2FooterHint">
+              With <strong>AI-assisted</strong>, you can use short placeholders here — AI will suggest copy in the last step when you tap Generate.
+            </p>
+            <div class="btn-row">
+              <button type="button" class="btn btn-ghost" data-back="1">Back</button>
+              <button type="button" class="btn btn-solid" id="btnStep2Next">Next</button>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="3" hidden>
+            <label for="pasteEmails">Paste emails (one per line)</label>
+            <textarea id="pasteEmails" placeholder="a@x.com&#10;b@y.com"></textarea>
+            <label for="csvFile">Apollo CSV export</label>
+            <input type="file" id="csvFile" accept=".csv,text/csv" />
+            <p class="muted" id="importSummary">No recipients yet.</p>
+            <div class="btn-row">
+              <button type="button" class="btn btn-ghost" data-back="2">Back</button>
+              <button type="button" class="btn btn-solid" id="btnStep3Next">Next</button>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="4" hidden>
+            <p class="muted" id="reviewIntro">Review recipients and email copy.</p>
+            <div class="btn-row" style="margin-bottom: 0.75rem" id="aiEnrichRow">
+              <button type="button" class="btn btn-solid" id="btnAiEnrich">Generate drafts (website + CSV)</button>
+            </div>
+            <p class="info-banner" id="manualModeBanner" hidden>
+              You're writing this yourself — same subject and message go to every checked recipient. Edit any row individually before sending.</p>
+            <div id="leadList"></div>
+            <label for="calendlyLink">Calendly link (appended in email)</label>
+            <input type="text" id="calendlyLink" value="https://calendly.com/tech-jump/30min" />
+            <div class="ai-seq-box" style="margin-top: 1rem; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: rgba(59, 130, 246, 0.06)">
+              <label style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; font-weight: 600">
+                <input type="checkbox" id="aiSequenceEnabled" checked style="margin-top: 0.2rem" />
+                <span>Enable AI follow-up emails after this kickoff (touch 2+)</span>
+              </label>
+              <div id="aiSendModeRow" style="margin-top: 0.65rem; padding-left: 1.6rem; font-size: 0.9rem; color: var(--muted)">
+                <span style="display: block; margin-bottom: 0.35rem">Follow-up handling:</span>
+                <label style="display: block; margin-bottom: 0.3rem; cursor: pointer">
+                  <input type="radio" name="aiSendMode" value="manual_review" checked />
+                  I'll approve each follow-up before it sends <em style="font-size:0.82em">(recommended)</em>
+                </label>
+                <label style="cursor: pointer">
+                  <input type="radio" name="aiSendMode" value="automatic" />
+                  Send automatically on schedule
+                </label>
+              </div>
+            </div>
+            <div class="btn-row" style="margin-top: 1rem">
+              <button type="button" class="btn btn-ghost" data-back="3">Back</button>
+              <button type="button" class="btn btn-solid" id="btnSendSelected">Send checked</button>
+            </div>
+            <p class="muted" id="sendStatus"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="start-modal-backdrop" class="modal-backdrop" aria-hidden="true">
+      <div class="modal modal--start" role="dialog" aria-labelledby="startModalTitle">
+        <div class="modal-head">
+          <h2 id="startModalTitle">New</h2>
+          <button type="button" class="btn-secondary" id="btnCloseStartModal">Close</button>
+        </div>
+        <div class="modal-body">
+          <p class="muted" style="margin-top: 0">What would you like to do?</p>
+          <div class="start-pick">
+            <button type="button" class="primary" id="btnPickImport">Import contacts with AI</button>
+            <button type="button" id="btnPickWizard">Step-by-step campaign</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="import-modal-backdrop" class="modal-backdrop" aria-hidden="true">
+      <div class="modal modal--import" role="dialog" aria-labelledby="importModalTitle">
+        <div class="modal-head">
+          <h2 id="importModalTitle">Import contacts</h2>
+          <button type="button" class="btn-secondary" id="btnCloseImportModal">Close</button>
+        </div>
+        <div class="modal-body">
+          <p class="err-text" id="importErr" hidden></p>
+          <div class="import-field">
+            <label>File type</label>
+            <div class="import-options">
+              <label><input type="radio" name="importKind" value="csv" checked /> CSV (Apollo)</label>
+              <label><input type="radio" name="importKind" value="excel" /> Excel (.xlsx)</label>
+              <label><input type="radio" name="importKind" value="text" /> Paste / .txt</label>
+            </div>
+          </div>
+          <div class="import-field">
+            <label>Save to</label>
+            <div class="import-options">
+              <label><input type="radio" name="importDest" value="inbound" checked /> Inbound leads</label>
+              <label><input type="radio" name="importDest" value="outreach" /> Outreach targets</label>
+            </div>
+          </div>
+          <div class="import-field" id="importFileRow">
+            <label class="import-drop-zone" id="importDropZone" for="importFile">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span class="drop-zone-text" id="importDropText">Drop file here or <u>click to browse</u></span>
+              <span class="drop-zone-sub">CSV, Excel (.xlsx), or .txt</span>
+              <input
+                type="file"
+                id="importFile"
+                accept=".csv,.txt,text/csv,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                style="position:absolute;inset:0;opacity:0;cursor:pointer"
+              />
+            </label>
+          </div>
+          <div class="import-field" id="importPasteRow" hidden>
+            <label for="importPaste">Or paste here</label>
+            <textarea id="importPaste" rows="5" placeholder="Paste export text, a column dump, or one contact per line…"></textarea>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-solid" id="btnRunParse">Parse with AI</button>
+          </div>
+          <div id="importLoading" class="tj-mascot-scene" hidden>
+            <div class="tj-mascot-row">
+              <div class="tj-file-float" aria-hidden="true">&#128196;</div>
+              <div>
+                <div class="tj-mascot" aria-hidden="true">
+                  TJ
+                  <div class="tj-mascot-eyes"><span class="tj-eye"></span><span class="tj-eye"></span></div>
+                </div>
+              </div>
+            </div>
+            <p class="muted" style="margin: 0; font-size: 0.85rem">Reading your file…</p>
+          </div>
+          <div id="importResultBlock" hidden>
+            <p class="muted" id="importParseNote" style="font-size: 0.8rem"></p>
+            <div class="import-preview-wrap">
+              <table>
+                <thead id="importThead"></thead>
+                <tbody id="importTbody"></tbody>
+              </table>
+            </div>
+            <div class="btn-row" style="margin-top: 0.75rem">
+              <button type="button" class="btn btn-solid" id="btnConfirmImport">Import now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="/js/auth-gate.js"></script>
+    <script src="/js/app-gate.js"></script>
+    <script src="/js/api-fetch.js"></script>
+    <script src="/js/tj-user-prefs-sync.js"></script>
+    <script src="/shell.js"></script>
+    <script>
+      (function () {
+        function getTenant() {
+          try {
+            var s = localStorage.getItem("leadsDashboardTenantId");
+            if (s != null && String(s).trim()) {
+              var t = String(s).trim().toLowerCase();
+              return t || "default";
+            }
+          } catch (e) {}
+          return "default";
+        }
+        var state = {
+          campaignName: "",
+          kickSubject: "",
+          kickBody: "",
+          leads: [],
+          writeMode: "ai",
+        };
+
+        var MANUAL_TEMPLATE =
+          "Hi [First name],\n\nI hope this finds you well. I'm reaching out on behalf of Tech Jump — we help businesses accelerate their growth through targeted lead generation and outreach automation.\n\nI'd love to explore whether there's an opportunity to support [Company] and would welcome a short call at your convenience.\n\nWould you be open to a 15–20 minute conversation this week or next?\n\nBest regards,\n[Your name]\nTech Jump\nhttps://calendly.com/tech-jump/30min";
+
+        function setWriteMode(mode) {
+          state.writeMode = mode;
+          var ai = document.getElementById("modeAi");
+          var lk = document.getElementById("modeLuke");
+          var foot = document.getElementById("step2FooterHint");
+          if (ai) ai.classList.toggle("selected", mode === "ai");
+          if (lk) lk.classList.toggle("selected", mode === "manual");
+          if (foot) {
+            foot.innerHTML =
+              mode === "ai"
+                ? "With <strong>AI-assisted</strong>, placeholders are fine — click <strong>Generate drafts</strong> on the last step to get tailored copy per company."
+                : "With <strong>Write it yourself</strong>, the same message goes to every recipient. Edit any individual row before sending.";
+          }
+        }
+
+        function refreshStep4Chrome() {
+          var list = document.getElementById("leadList");
+          var aiRow = document.getElementById("aiEnrichRow");
+          var man = document.getElementById("manualModeBanner");
+          var intro = document.getElementById("reviewIntro");
+          if (state.writeMode === "manual") {
+            if (list) list.classList.add("lead-list--manual");
+            if (aiRow) aiRow.hidden = true;
+            if (man) man.hidden = false;
+            if (intro) intro.textContent = "Review recipients — your message is applied to each row. Edit any row individually before sending.";
+          } else {
+            if (list) list.classList.remove("lead-list--manual");
+            if (aiRow) aiRow.hidden = false;
+            if (man) man.hidden = true;
+            if (intro) intro.textContent = "Generate AI drafts, then review and edit each row before sending.";
+          }
+        }
+
+        var modal = document.getElementById("modal-backdrop");
+        var stepDots = document.getElementById("stepDots");
+        var wizardErr = document.getElementById("wizardErr");
+
+        function showErr(msg) {
+          wizardErr.textContent = msg || "";
+          wizardErr.hidden = !msg;
+        }
+
+        function setStep(n) {
+          showErr("");
+          var steps = document.querySelectorAll(".wizard-step");
+          for (var i = 0; i < steps.length; i++) {
+            var s = steps[i];
+            s.hidden = parseInt(s.getAttribute("data-step"), 10) !== n;
+          }
+          stepDots.textContent = n + " / 4";
+        }
+
+        function openModal() {
+          modal.classList.add("open");
+          modal.setAttribute("aria-hidden", "false");
+          state.campaignName = "";
+          state.kickSubject = "";
+          state.kickBody = "";
+          state.leads = [];
+          setWriteMode("ai");
+          document.getElementById("campName").value = "";
+          document.getElementById("kickSubject").value = "";
+          document.getElementById("kickBody").value = "";
+          document.getElementById("pasteEmails").value = "";
+          document.getElementById("csvFile").value = "";
+          document.getElementById("importSummary").textContent = "No recipients yet.";
+          document.getElementById("leadList").innerHTML = "";
+          document.getElementById("sendStatus").textContent = "";
+          setStep(1);
+        }
+
+        function closeModal() {
+          modal.classList.remove("open");
+          modal.setAttribute("aria-hidden", "true");
+        }
+
+        var startBackdrop = document.getElementById("start-modal-backdrop");
+        var importBackdrop = document.getElementById("import-modal-backdrop");
+        var __importParse = null;
+
+        function setImportErr(msg) {
+          var el = document.getElementById("importErr");
+          if (!el) return;
+          el.textContent = msg || "";
+          el.hidden = !msg;
+        }
+
+        function syncImportKindUi() {
+          var kindR = document.querySelectorAll('input[name="importKind"]');
+          var kind = "csv";
+          for (var i = 0; i < kindR.length; i++) {
+            if (kindR[i].checked) {
+              kind = kindR[i].value;
+              break;
+            }
+          }
+          var fileRow = document.getElementById("importFileRow");
+          var pasteRow = document.getElementById("importPasteRow");
+          var fileInput = document.getElementById("importFile");
+          if (!fileRow || !pasteRow || !fileInput) return;
+          if (kind === "text") {
+            fileRow.hidden = false;
+            pasteRow.hidden = false;
+            fileInput.accept = ".txt,text/plain";
+          } else if (kind === "excel") {
+            fileRow.hidden = false;
+            pasteRow.hidden = true;
+            fileInput.accept =
+              ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+          } else {
+            fileRow.hidden = false;
+            pasteRow.hidden = true;
+            fileInput.accept = ".csv,text/csv";
+          }
+        }
+
+        function resetImportModal() {
+          __importParse = null;
+          setImportErr("");
+          var loading = document.getElementById("importLoading");
+          if (loading) loading.hidden = true;
+          var res = document.getElementById("importResultBlock");
+          if (res) res.hidden = true;
+          var note = document.getElementById("importParseNote");
+          if (note) note.textContent = "";
+          var tbody = document.getElementById("importTbody");
+          var thead = document.getElementById("importThead");
+          if (tbody) tbody.innerHTML = "";
+          if (thead) thead.innerHTML = "";
+          var f = document.getElementById("importFile");
+          if (f) f.value = "";
+          var p = document.getElementById("importPaste");
+          if (p) p.value = "";
+          var dz = document.getElementById("importDropZone");
+          var dt = document.getElementById("importDropText");
+          if (dz) { dz.classList.remove("has-file", "drag-over"); }
+          if (dt) dt.innerHTML = 'Drop file here or <u>click to browse</u>';
+          var rc = document.querySelector('input[name="importKind"][value="csv"]');
+          var ri = document.querySelector('input[name="importDest"][value="inbound"]');
+          if (rc) rc.checked = true;
+          if (ri) ri.checked = true;
+          syncImportKindUi();
+        }
+
+        function openStartModal() {
+          closeImportModal();
+          closeModal();
+          if (startBackdrop) {
+            startBackdrop.classList.add("open");
+            startBackdrop.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        function closeStartModal() {
+          if (startBackdrop) {
+            startBackdrop.classList.remove("open");
+            startBackdrop.setAttribute("aria-hidden", "true");
+          }
+        }
+
+        function openImportModal() {
+          resetImportModal();
+          if (importBackdrop) {
+            importBackdrop.classList.add("open");
+            importBackdrop.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        function closeImportModal() {
+          if (importBackdrop) {
+            importBackdrop.classList.remove("open");
+            importBackdrop.setAttribute("aria-hidden", "true");
+          }
+        }
+
+        function renderImportPreview(data) {
+          var note = document.getElementById("importParseNote");
+          var fn = data.fileName || "upload";
+          var parts = [];
+          if (data.parseNote) parts.push(escapeHtml(data.parseNote));
+          parts.push("Source file: " + escapeHtml(fn));
+          if (!data.contacts || !data.contacts.length) {
+            parts.push("No rows with a valid email — check the file or try Paste / .txt.");
+          }
+          if (note) note.innerHTML = parts.join("<br>");
+          var thead = document.getElementById("importThead");
+          var tbody = document.getElementById("importTbody");
+          if (!thead || !tbody) return;
+          thead.innerHTML =
+            "<tr><th>First</th><th>Last</th><th>Title</th><th>Company</th><th>Email</th><th>Warnings</th></tr>";
+          tbody.innerHTML = "";
+          var list = data.contacts || [];
+          for (var i = 0; i < list.length; i++) {
+            var c = list[i];
+            var w = Array.isArray(c.warnings) ? c.warnings.join("; ") : "";
+            var tr = document.createElement("tr");
+            tr.innerHTML =
+              "<td>" +
+              escapeHtml(c.firstName || "") +
+              "</td><td>" +
+              escapeHtml(c.lastName || "") +
+              "</td><td>" +
+              escapeHtml(c.title || "") +
+              "</td><td>" +
+              escapeHtml(c.companyName || "") +
+              "</td><td>" +
+              escapeHtml(c.email || "") +
+              "</td><td>" +
+              escapeHtml(w) +
+              "</td>";
+            tbody.appendChild(tr);
+          }
+        }
+
+        function runImportParse() {
+          setImportErr("");
+          var kindR = document.querySelectorAll('input[name="importKind"]');
+          var kind = "csv";
+          for (var i = 0; i < kindR.length; i++) {
+            if (kindR[i].checked) {
+              kind = kindR[i].value;
+              break;
+            }
+          }
+          var pasteEl = document.getElementById("importPaste");
+          var paste = pasteEl ? pasteEl.value.trim() : "";
+          var fileInput = document.getElementById("importFile");
+          var file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+          var loading = document.getElementById("importLoading");
+          var resBlock = document.getElementById("importResultBlock");
+          if (loading) loading.hidden = false;
+          if (resBlock) resBlock.hidden = true;
+          __importParse = null;
+
+          function finishErr(msg) {
+            if (loading) loading.hidden = true;
+            setImportErr(msg);
+          }
+
+          function doRequest(payload) {
+            TJFetch("/api/ai/parse-contacts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            })
+              .then(function (res) {
+                return res.json().then(function (body) {
+                  return { res: res, body: body };
+                });
+              })
+              .then(function (x) {
+                if (loading) loading.hidden = true;
+                if (!x.res.ok) {
+                  setImportErr((x.body && x.body.error) || "Parse failed (" + x.res.status + ")");
+                  return;
+                }
+                var b = x.body;
+                __importParse = {
+                  contacts: b.contacts || [],
+                  parseNote: b.parseNote || "",
+                  fileName: b.fileName || (file ? file.name : "paste"),
+                };
+                renderImportPreview({
+                  contacts: __importParse.contacts,
+                  parseNote: __importParse.parseNote,
+                  fileName: __importParse.fileName,
+                  count: b.count,
+                });
+                if (resBlock) resBlock.hidden = false;
+              })
+              .catch(function (e) {
+                finishErr(e.message || String(e));
+              });
+          }
+
+          var tenant = getTenant();
+
+          if (kind === "excel") {
+            if (!file) {
+              finishErr("Choose an Excel (.xlsx) file.");
+              return;
+            }
+            var r = new FileReader();
+            r.onload = function () {
+              doRequest({
+                tenantId: tenant,
+                kind: "excel",
+                fileName: file.name || "sheet.xlsx",
+                base64: r.result,
+              });
+            };
+            r.onerror = function () {
+              finishErr("Could not read file.");
+            };
+            r.readAsDataURL(file);
+            return;
+          }
+
+          if (kind === "csv") {
+            if (!file) {
+              finishErr("Upload an Apollo CSV, or choose Paste / .txt.");
+              return;
+            }
+            var r2 = new FileReader();
+            r2.onload = function () {
+              var t = r2.result;
+              if (!t || !String(t).trim()) {
+                finishErr("That CSV looks empty.");
+                return;
+              }
+              doRequest({
+                tenantId: tenant,
+                kind: "csv",
+                fileName: file.name || "export.csv",
+                text: t,
+              });
+            };
+            r2.onerror = function () {
+              finishErr("Could not read file.");
+            };
+            r2.readAsText(file);
+            return;
+          }
+
+          function sendText(text, name) {
+            if (!text || !String(text).trim()) {
+              finishErr("Paste text or upload a .txt file.");
+              return;
+            }
+            doRequest({ tenantId: tenant, kind: "text", fileName: name, text: text });
+          }
+
+          if (file) {
+            var r3 = new FileReader();
+            r3.onload = function () {
+              var t = r3.result;
+              if (paste) t = paste + "\n\n" + t;
+              sendText(t, file.name || "notes.txt");
+            };
+            r3.onerror = function () {
+              finishErr("Could not read file.");
+            };
+            r3.readAsText(file);
+          } else {
+            sendText(paste, "paste.txt");
+          }
+        }
+
+        function confirmImportNow() {
+          if (!__importParse || !__importParse.contacts || !__importParse.contacts.length) {
+            setImportErr("Parse contacts first — nothing to import.");
+            return;
+          }
+          setImportErr("");
+          var destR = document.querySelectorAll('input[name="importDest"]');
+          var dest = "inbound";
+          for (var i = 0; i < destR.length; i++) {
+            if (destR[i].checked) {
+              dest = destR[i].value;
+              break;
+            }
+          }
+          var url = dest === "outreach" ? "/api/targets/bulk-import" : "/api/leads/bulk-import";
+          var tenant = getTenant();
+          var loading = document.getElementById("importLoading");
+          if (loading) loading.hidden = false;
+          TJFetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              tenantId: tenant,
+              sourceFileName: __importParse.fileName,
+              contacts: __importParse.contacts,
+            }),
+          })
+            .then(function (res) {
+              return res.json().then(function (body) {
+                return { res: res, body: body };
+              });
+            })
+            .then(function (x) {
+              if (loading) loading.hidden = true;
+              if (!x.res.ok) {
+                setImportErr((x.body && x.body.error) || "Import failed (" + x.res.status + ")");
+                return;
+              }
+              var n = x.body.created != null ? x.body.created : __importParse.contacts.length;
+              closeImportModal();
+              closeStartModal();
+              loadBubbles();
+              if (dest === "outreach") {
+                alert("Imported " + n + " outreach target(s). Open Pipeline to review.");
+              } else {
+                alert("Imported " + n + " inbound lead(s). Open Pipeline and check Inbound.");
+              }
+            })
+            .catch(function (e) {
+              if (loading) loading.hidden = true;
+              setImportErr(e.message || String(e));
+            });
+        }
+
+        function parsePastedEmails(text) {
+          var lines = (text || "").split(/\r?\n/);
+          var out = [];
+          var seen = {};
+          for (var i = 0; i < lines.length; i++) {
+            var e = lines[i].trim().toLowerCase();
+            if (!e || e.indexOf("@") === -1) continue;
+            if (seen[e]) continue;
+            seen[e] = 1;
+            out.push({
+              email: e,
+              firstName: "",
+              lastName: "",
+              company: "",
+              title: "",
+              website: "",
+            });
+          }
+          return out;
+        }
+
+        function mergeCsvLeads(rows) {
+          var byEmail = {};
+          for (var i = 0; i < state.leads.length; i++) {
+            byEmail[state.leads[i].email] = Object.assign({}, state.leads[i]);
+          }
+          for (var j = 0; j < rows.length; j++) {
+            var r = rows[j];
+            var em = (r.email || "").trim().toLowerCase();
+            if (!em || em.indexOf("@") === -1) continue;
+            byEmail[em] = Object.assign(byEmail[em] || { email: em }, r, { email: em });
+          }
+          var list = [];
+          for (var k in byEmail) {
+            if (Object.prototype.hasOwnProperty.call(byEmail, k)) list.push(byEmail[k]);
+          }
+          return list;
+        }
+
+        function renderLeadCards() {
+          var host = document.getElementById("leadList");
+          host.innerHTML = "";
+          refreshStep4Chrome();
+          for (var i = 0; i < state.leads.length; i++) {
+            var L = state.leads[i];
+            var card = document.createElement("div");
+            card.className = "lead-card";
+            card.setAttribute("data-idx", String(i));
+            var name =
+              (L.firstName || "") +
+              (L.firstName && L.lastName ? " " : "") +
+              (L.lastName || "");
+            var hintsHtml = "";
+            if (L.enrichHintMessages && L.enrichHintMessages.length) {
+              hintsHtml =
+                '<div class="lead-hints">' +
+                L.enrichHintMessages.map(function (h) {
+                  return escapeHtml(h);
+                }).join("<br>") +
+                "</div>";
+            } else if (state.writeMode === "ai" && !(L.website || "").trim()) {
+              hintsHtml =
+                '<div class="lead-hints">No website in CSV for this contact — after you run <strong>Generate AI drafts</strong>, we’ll use a careful generic intro. You can always edit before sending.</div>';
+            }
+            card.innerHTML =
+              "<h4>" +
+              escapeHtml(L.email) +
+              "</h4>" +
+              '<div class="lead-meta">' +
+              escapeHtml(name || "—") +
+              " · " +
+              escapeHtml(L.company || "—") +
+              (L.website
+                ? " · " + escapeHtml(L.website)
+                : ' · <span class="muted">no website in CSV</span>') +
+              "</div>" +
+              hintsHtml +
+              '<div class="f-one-wrap">' +
+              '<label style="font-size:0.65rem">One-liner</label>' +
+              '<textarea class="f-one" placeholder="Hook about their company (optional)">' +
+              escapeHtml(L.oneLiner || "") +
+              "</textarea></div>" +
+              '<label style="font-size:0.65rem">Subject</label>' +
+              '<input type="text" class="f-sub" value="' +
+              escapeAttr(L.suggestedSubject || state.kickSubject) +
+              '" />' +
+              '<label style="font-size:0.65rem">Body</label>' +
+              '<textarea class="f-body">' +
+              escapeHtml(L.suggestedBody || state.kickBody) +
+              "</textarea>" +
+              '<label class="chk-send"><input type="checkbox" class="f-chk" checked /> Send this one</label>';
+            host.appendChild(card);
+          }
+        }
+
+        function syncCardsToState() {
+          var cards = document.querySelectorAll(".lead-card");
+          for (var c = 0; c < cards.length; c++) {
+            var card = cards[c];
+            var idx = parseInt(card.getAttribute("data-idx"), 10);
+            if (!state.leads[idx]) continue;
+            var one = card.querySelector(".f-one");
+            var sub = card.querySelector(".f-sub");
+            var body = card.querySelector(".f-body");
+            if (one) state.leads[idx].oneLiner = one.value;
+            if (sub) state.leads[idx].suggestedSubject = sub.value;
+            if (body) state.leads[idx].suggestedBody = body.value;
+          }
+        }
+
+        function readCardsFromDom() {
+          var cards = document.querySelectorAll(".lead-card");
+          for (var c = 0; c < cards.length; c++) {
+            var card = cards[c];
+            var idx = parseInt(card.getAttribute("data-idx"), 10);
+            if (!state.leads[idx]) continue;
+            var one = card.querySelector(".f-one");
+            var sub = card.querySelector(".f-sub");
+            var body = card.querySelector(".f-body");
+            var chk = card.querySelector(".f-chk");
+            state.leads[idx].oneLiner = one ? one.value : "";
+            state.leads[idx].suggestedSubject = sub ? sub.value : "";
+            state.leads[idx].suggestedBody = body ? body.value : "";
+            state.leads[idx].sendThis = chk ? chk.checked : false;
+          }
+        }
+
+        function escapeHtml(s) {
+          return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        }
+        function escapeAttr(s) {
+          return escapeHtml(s).replace(/"/g, "&quot;");
+        }
+
+        var BUBBLE_COLORS = {
+          not_sent: "#3b82f6",
+          no_reply: "#ef4444",
+          replied: "#eab308",
+          booked: "#22c55e",
+        };
+
+        var __bubbleState = { targets: null, tenant: "default" };
+
+        function normalizeOutreachStatusBubble(T) {
+          var raw = (
+            T.outreachStatus != null
+              ? String(T.outreachStatus)
+              : T.emailOutreachStatus != null
+                ? String(T.emailOutreachStatus)
+                : ""
+          )
+            .toLowerCase()
+            .trim();
+          if (raw === "opened" || raw === "open" || raw === "opened_by_recipient") return "opened";
+          if (raw === "sent" || raw === "delivered" || raw === "queued") return "sent";
+          if (raw === "not_sent" || raw === "draft" || raw === "pending") return "not_sent";
+          if (raw) {
+            if (raw.indexOf("open") !== -1) return "opened";
+            if (raw.indexOf("sent") !== -1 || raw.indexOf("deliver") !== -1) return "sent";
+          }
+          var leg = T.status != null ? String(T.status).toLowerCase() : "";
+          if (leg.indexOf("open") !== -1) return "opened";
+          if (leg.indexOf("sent") !== -1 || leg.indexOf("deliver") !== -1) return "sent";
+          return "not_sent";
+        }
+
+        function normalizePipelineStatusBubble(T) {
+          var raw = (T.pipelineStatus != null ? String(T.pipelineStatus) : "").toLowerCase().trim();
+          if (
+            raw === "need_send" ||
+            raw === "waiting_on_them" ||
+            raw === "waiting_on_us" ||
+            raw === "booked"
+          ) {
+            return raw;
+          }
+          var leg = normalizeOutreachStatusBubble(T);
+          if (leg === "not_sent") return "need_send";
+          if (leg === "opened" || leg === "sent") return "waiting_on_them";
+          return "need_send";
+        }
+
+        function bubbleStatusKey(T) {
+          var st = normalizePipelineStatusBubble(T);
+          if (st === "booked") return "booked";
+          if (st === "waiting_on_us") return "replied";
+          if (st === "waiting_on_them") return "no_reply";
+          return "not_sent";
+        }
+
+        function bubbleStatusLabel(key) {
+          switch (key) {
+            case "booked":
+              return "Meeting booked";
+            case "replied":
+              return "They replied — your turn";
+            case "no_reply":
+              return "Sent — no reply yet";
+            default:
+              return "Added — no send yet";
+          }
+        }
+
+        function targetCompanyNameBubble(T) {
+          if (T.companyName != null && String(T.companyName).trim()) return String(T.companyName).trim();
+          if (T.name != null && String(T.name).trim()) return String(T.name).trim();
+          return "—";
+        }
+
+        function extractTargetEmailBubble(T) {
+          if (T.contactEmail != null && String(T.contactEmail).trim()) return String(T.contactEmail).trim();
+          if (T.contact && T.contact.email != null && String(T.contact.email).trim()) {
+            return String(T.contact.email).trim();
+          }
+          return "";
+        }
+
+        var MAX_CAMP_TABLE_ROWS = 75;
+
+        function updateCampaignPipelineLinks(tenant) {
+          var q = "/leads.html?view=pipeline&tenantId=" + encodeURIComponent(tenant);
+          var a = document.getElementById("campInboundPipelineLink");
+          var b = document.getElementById("campOutreachPipelineLink");
+          var emptyPipe = document.getElementById("bubbleEmptyPipelineLink");
+          var emptyEmail = document.getElementById("bubbleEmptyEmailLink");
+          if (a) a.setAttribute("href", q);
+          if (b) b.setAttribute("href", q);
+          if (emptyPipe) emptyPipe.setAttribute("href", q);
+          if (emptyEmail) {
+            emptyEmail.setAttribute("href", "/email.html?tenantId=" + encodeURIComponent(tenant));
+          }
+        }
+
+        function campSetInboundErr(msg) {
+          var el = document.getElementById("campInboundErr");
+          if (!el) return;
+          el.textContent = msg || "";
+          el.hidden = !msg;
+        }
+
+        function campSetOutreachErr(msg) {
+          var el = document.getElementById("campOutreachErr");
+          if (!el) return;
+          el.textContent = msg || "";
+          el.hidden = !msg;
+        }
+
+        function renderCampaignInboundTable(leads, tenant) {
+          campSetInboundErr("");
+          var tbody = document.getElementById("campInboundTbody");
+          var scroll = document.getElementById("campInboundScroll");
+          var empty = document.getElementById("campInboundEmpty");
+          var more = document.getElementById("campInboundMore");
+          var meta = document.getElementById("campInboundMeta");
+          if (!tbody || !scroll || !empty) return;
+          updateCampaignPipelineLinks(tenant);
+          var list = leads || [];
+          var n = list.length;
+          if (meta) {
+            meta.textContent = n ? n + (n === 1 ? " row" : " rows") : "—";
+          }
+          if (!n) {
+            tbody.innerHTML = "";
+            scroll.hidden = true;
+            empty.hidden = false;
+            if (more) {
+              more.hidden = true;
+              more.textContent = "";
+            }
+            return;
+          }
+          empty.hidden = true;
+          scroll.hidden = false;
+          var slice = list.slice(0, MAX_CAMP_TABLE_ROWS);
+          var rows = [];
+          for (var i = 0; i < slice.length; i++) {
+            var L = slice[i];
+            var c = L.contact || {};
+            var name = c.name != null && String(c.name).trim() ? String(c.name).trim() : "—";
+            var em = c.email != null && String(c.email).trim() ? String(c.email).trim() : "—";
+            var st = L.status != null ? String(L.status) : "—";
+            rows.push(
+              "<tr><td>" +
+                escapeHtml(name) +
+                "</td><td>" +
+                escapeHtml(em) +
+                "</td><td>" +
+                escapeHtml(st) +
+                "</td></tr>",
+            );
+          }
+          tbody.innerHTML = rows.join("");
+          if (more) {
+            if (n > MAX_CAMP_TABLE_ROWS) {
+              more.textContent =
+                "Showing first " + MAX_CAMP_TABLE_ROWS + " of " + n + " — open Pipeline for the rest.";
+              more.hidden = false;
+            } else {
+              more.textContent = "";
+              more.hidden = true;
+            }
+          }
+        }
+
+        function renderCampaignOutreachTable(targets, tenant) {
+          campSetOutreachErr("");
+          var tbody = document.getElementById("campOutreachTbody");
+          var scroll = document.getElementById("campOutreachScroll");
+          var empty = document.getElementById("campOutreachEmpty");
+          var more = document.getElementById("campOutreachMore");
+          var meta = document.getElementById("campOutreachMeta");
+          if (!tbody || !scroll || !empty) return;
+          updateCampaignPipelineLinks(tenant);
+          var list = targets || [];
+          var n = list.length;
+          if (meta) {
+            meta.textContent = n ? n + (n === 1 ? " company" : " companies") : "—";
+          }
+          if (!n) {
+            tbody.innerHTML = "";
+            scroll.hidden = true;
+            empty.hidden = false;
+            if (more) {
+              more.hidden = true;
+              more.textContent = "";
+            }
+            return;
+          }
+          empty.hidden = true;
+          scroll.hidden = false;
+          var slice = list.slice(0, MAX_CAMP_TABLE_ROWS);
+          var rows = [];
+          for (var j = 0; j < slice.length; j++) {
+            var T = slice[j];
+            var sk = bubbleStatusKey(T);
+            var fill = BUBBLE_COLORS[sk] || BUBBLE_COLORS.not_sent;
+            var co = targetCompanyNameBubble(T);
+            var em2 = extractTargetEmailBubble(T);
+            var label = bubbleStatusLabel(sk);
+            var id = T.id != null ? String(T.id).trim() : "";
+            var rowUrl =
+              id !== ""
+                ? "/leads.html?view=pipeline&tenantId=" +
+                  encodeURIComponent(tenant) +
+                  "&focusTarget=" +
+                  encodeURIComponent(id)
+                : "/leads.html?view=pipeline&tenantId=" + encodeURIComponent(tenant);
+            rows.push(
+              "<tr><td>" +
+                escapeHtml(co) +
+                "</td><td>" +
+                escapeHtml(em2 || "—") +
+                '</td><td><span class="camp-dot" style="background:' +
+                fill +
+                '"></span>' +
+                escapeHtml(label) +
+                '</td><td><a href="' +
+                escapeAttr(rowUrl) +
+                '">Open</a></td></tr>',
+            );
+          }
+          tbody.innerHTML = rows.join("");
+          if (more) {
+            if (n > MAX_CAMP_TABLE_ROWS) {
+              more.textContent =
+                "Showing first " + MAX_CAMP_TABLE_ROWS + " of " + n + " — open Pipeline for the rest.";
+              more.hidden = false;
+            } else {
+              more.hidden = true;
+              more.textContent = "";
+            }
+          }
+        }
+
+        function setBubbleErr(msg) {
+          var bubbleErr = document.getElementById("bubbleErr");
+          if (!bubbleErr) return;
+          bubbleErr.textContent = msg || "";
+          bubbleErr.hidden = !msg;
+        }
+
+        function loadBubbles() {
+          setBubbleErr("");
+          campSetInboundErr("");
+          campSetOutreachErr("");
+          var tenant = getTenant();
+          updateCampaignPipelineLinks(tenant);
+
+          var tUrl = "/api/targets?tenantId=" + encodeURIComponent(tenant) + "&_=" + Date.now();
+          var lUrl = "/api/leads?tenantId=" + encodeURIComponent(tenant) + "&_=" + Date.now();
+
+          var pT = TJFetch(tUrl, {cache: "no-store"}).then(function (res) {
+            return res.json().then(function (body) {
+              return {res: res, body: body};
+            });
+          });
+          var pL = TJFetch(lUrl, {cache: "no-store"}).then(function (res) {
+            return res.json().then(function (body) {
+              return {res: res, body: body};
+            });
+          });
+
+          Promise.all([pT, pL])
+            .then(function (pair) {
+              var xT = pair[0];
+              var xL = pair[1];
+              var bubbleWrap = document.getElementById("bubble-chart-wrap");
+              var bubbleEmpty = document.getElementById("bubbleEmpty");
+
+              if (!xT.res.ok) {
+                setBubbleErr(
+                  (xT.body && xT.body.error) || "Could not load outreach (" + xT.res.status + ")",
+                );
+                if (bubbleWrap) bubbleWrap.hidden = true;
+                if (bubbleEmpty) bubbleEmpty.hidden = true;
+                __bubbleState.targets = null;
+                renderCampaignOutreachTable([], tenant);
+                campSetOutreachErr(
+                  (xT.body && xT.body.error) || "Could not load outreach targets (" + xT.res.status + ").",
+                );
+              } else {
+                var targets = xT.body.targets || [];
+                renderBubblePack(targets, tenant);
+                renderCampaignOutreachTable(targets, tenant);
+              }
+
+              if (!xL.res.ok) {
+                campSetInboundErr(
+                  (xL.body && xL.body.error) || "Could not load inbound leads (" + xL.res.status + ").",
+                );
+                var tbodyI = document.getElementById("campInboundTbody");
+                var scrollI = document.getElementById("campInboundScroll");
+                var emptyI = document.getElementById("campInboundEmpty");
+                var metaI = document.getElementById("campInboundMeta");
+                var moreI = document.getElementById("campInboundMore");
+                if (tbodyI) tbodyI.innerHTML = "";
+                if (scrollI) scrollI.hidden = true;
+                if (emptyI) emptyI.hidden = true;
+                if (metaI) metaI.textContent = "—";
+                if (moreI) {
+                  moreI.hidden = true;
+                  moreI.textContent = "";
+                }
+              } else {
+                var leads = xL.body.leads || [];
+                renderCampaignInboundTable(leads, tenant);
+              }
+            })
+            .catch(function (e) {
+              var msg = e.message || String(e);
+              setBubbleErr(msg);
+              var bubbleWrap2 = document.getElementById("bubble-chart-wrap");
+              var bubbleEmpty2 = document.getElementById("bubbleEmpty");
+              if (bubbleWrap2) bubbleWrap2.hidden = true;
+              if (bubbleEmpty2) bubbleEmpty2.hidden = true;
+              __bubbleState.targets = null;
+              var tenantCatch = getTenant();
+              renderCampaignInboundTable([], tenantCatch);
+              renderCampaignOutreachTable([], tenantCatch);
+              campSetInboundErr(msg);
+              campSetOutreachErr(msg);
+            });
+        }
+
+        function bubbleRelativeTime(raw) {
+          try {
+            var diff = Date.now() - new Date(raw).getTime();
+            var m = Math.floor(diff / 60000);
+            if (m < 2) return "just now";
+            if (m < 60) return m + "m ago";
+            var h = Math.floor(m / 60);
+            if (h < 24) return h + "h ago";
+            return Math.floor(h / 24) + "d ago";
+          } catch (e) {
+            return "";
+          }
+        }
+
+        /** One donut ring: each slice = one outreach row, color = pipeline status. Click → Pipeline row. */
+        function donutSlicePath(cx, cy, R, rInner, a0, a1) {
+          var delta = a1 - a0;
+          var large = Math.abs(delta) > Math.PI ? 1 : 0;
+          function pt(radius, ang) {
+            return [cx + radius * Math.cos(ang), cy + radius * Math.sin(ang)];
+          }
+          var sweepOuter = 1;
+          var o0 = pt(R, a0);
+          var o1 = pt(R, a1);
+          var i1 = pt(rInner, a1);
+          var i0 = pt(rInner, a0);
+          return (
+            "M " +
+            o0[0].toFixed(3) +
+            " " +
+            o0[1].toFixed(3) +
+            " A " +
+            R +
+            " " +
+            R +
+            " 0 " +
+            large +
+            " " +
+            sweepOuter +
+            " " +
+            o1[0].toFixed(3) +
+            " " +
+            o1[1].toFixed(3) +
+            " L " +
+            i1[0].toFixed(3) +
+            " " +
+            i1[1].toFixed(3) +
+            " A " +
+            rInner +
+            " " +
+            rInner +
+            " 0 " +
+            large +
+            " 0 " +
+            i0[0].toFixed(3) +
+            " " +
+            i0[1].toFixed(3) +
+            " Z"
+          );
+        }
+
+        function openEmailForBubbleTarget(T, tenant) {
+          var em = extractTargetEmailBubble(T);
+          if (em.indexOf("@") === -1) {
+            window.location.href = "/email.html?tenantId=" + encodeURIComponent(tenant);
+            return;
+          }
+          var item = {
+            targetId: String(T.id || "").trim(),
+            email: em,
+            companyName: targetCompanyNameBubble(T),
+            directorName: String(T.greetingNameHint || T.directorName || "").trim(),
+            campaignName:
+              T.lastCampaignName != null && String(T.lastCampaignName).trim()
+                ? String(T.lastCampaignName).trim()
+                : "",
+            city: String(T.city || "").trim(),
+          };
+          try {
+            sessionStorage.setItem(
+              "tj_email_bulk_queue",
+              JSON.stringify({tenantId: tenant, items: [item]}),
+            );
+          } catch (err) {
+            window.location.href = "/email.html?tenantId=" + encodeURIComponent(tenant);
+            return;
+          }
+          window.location.href = "/email.html?tenantId=" + encodeURIComponent(tenant);
+        }
+
+        function updateOutreachSubCopy(targetCount) {
+          var el = document.getElementById("campOutreachSub");
+          if (!el) return;
+          if (targetCount <= 1) {
+            el.innerHTML =
+              'Same list as above — <strong>no send yet</strong> rows are good candidates for ' +
+              '<a class="link-quiet" href="/email.html">Send email</a>. Stored as <code>targets</code>.';
+          } else {
+            el.innerHTML =
+              'Same list as the ring — blue slices are still <strong>no send yet</strong> (good candidates for ' +
+              '<a class="link-quiet" href="/email.html">Send email</a>). Stored as <code>targets</code>.';
+          }
+        }
+
+        function setBubbleSectionMode(targetCount) {
+          var section = document.querySelector(".outreach-bubbles");
+          var legend = document.getElementById("bubbleLegend");
+          if (section) {
+            section.classList.remove("outreach-bubbles--sparse", "outreach-bubbles--donut");
+            if (targetCount <= 1) {
+              section.classList.add("outreach-bubbles--sparse");
+            } else {
+              section.classList.add("outreach-bubbles--donut");
+            }
+          }
+          if (legend) {
+            legend.hidden = targetCount <= 1;
+          }
+          updateOutreachSubCopy(targetCount);
+        }
+
+        function renderBubbleCompactCard(T, tenant) {
+          var card = document.getElementById("bubbleCompactCard");
+          var compactWrap = document.getElementById("bubble-compact-wrap");
+          if (!card || !compactWrap) return;
+          var sk = bubbleStatusKey(T);
+          var color = BUBBLE_COLORS[sk] || BUBBLE_COLORS.not_sent;
+          var name = targetCompanyNameBubble(T);
+          var email = extractTargetEmailBubble(T);
+          var campaign =
+            T.lastCampaignName != null && String(T.lastCampaignName).trim()
+              ? String(T.lastCampaignName).trim()
+              : "—";
+          var sent =
+            T.lastEmailSentAt != null && String(T.lastEmailSentAt).trim()
+              ? String(T.lastEmailSentAt).trim()
+              : "";
+          var sentLine = sent ? "Last sent " + bubbleRelativeTime(sent) : "No email sent yet";
+          card.innerHTML =
+            '<span class="bubble-compact-card__rail" style="background:' +
+            color +
+            '"></span>' +
+            '<div class="bubble-compact-card__body">' +
+            '<div class="bubble-compact-card__head">' +
+            '<p class="bubble-compact-card__name">' +
+            escapeHtml(name) +
+            "</p>" +
+            '<span class="bubble-compact-status"><i style="background:' +
+            color +
+            '"></i>' +
+            escapeHtml(bubbleStatusLabel(sk)) +
+            "</span></div>" +
+            '<div class="bubble-compact-meta">' +
+            (email
+              ? '<div class="bubble-compact-meta__item"><strong>Contact</strong><br />' +
+                escapeHtml(email) +
+                "</div>"
+              : "") +
+            (campaign !== "—"
+              ? '<div class="bubble-compact-meta__item"><strong>Campaign</strong><br />' +
+                escapeHtml(campaign) +
+                "</div>"
+              : "") +
+            '<div class="bubble-compact-meta__item"><strong>Activity</strong><br />' +
+            escapeHtml(sentLine) +
+            "</div></div>" +
+            '<div class="bubble-compact-actions">' +
+            '<button type="button" class="bubble-compact-open-pipeline">Open in Pipeline</button>' +
+            '<button type="button" class="bubble-compact-send-email bubble-compact-actions__primary">Send email</button>' +
+            "</div></div>";
+          compactWrap.hidden = false;
+          compactWrap.classList.add("visible");
+          var btnPipe = card.querySelector(".bubble-compact-open-pipeline");
+          var btnEmail = card.querySelector(".bubble-compact-send-email");
+          if (btnPipe) {
+            btnPipe.addEventListener("click", function () {
+              if (!T.id) return;
+              window.location.href =
+                "/leads.html?view=pipeline&tenantId=" +
+                encodeURIComponent(tenant) +
+                "&focusTarget=" +
+                encodeURIComponent(String(T.id).trim());
+            });
+          }
+          if (btnEmail) {
+            btnEmail.addEventListener("click", function () {
+              openEmailForBubbleTarget(T, tenant);
+            });
+          }
+        }
+
+        function renderBubblePack(targets, tenant) {
+          __bubbleState.targets = targets;
+          __bubbleState.tenant = tenant;
+
+          var bubbleTip = document.getElementById("bubble-tooltip");
+          var bubbleErr = document.getElementById("bubbleErr");
+          var bubbleWrap = document.getElementById("bubble-chart-wrap");
+          var bubbleEmpty = document.getElementById("bubbleEmpty");
+          var compactWrap = document.getElementById("bubble-compact-wrap");
+          var bubbleCount = document.getElementById("bubbleCount");
+          var svgEl = document.getElementById("bubble-donut-svg");
+
+          if (bubbleErr) {
+            bubbleErr.textContent = "";
+            bubbleErr.hidden = true;
+          }
+          if (!bubbleCount || !bubbleWrap || !bubbleEmpty || !svgEl) return;
+
+          bubbleCount.textContent = targets.length
+            ? targets.length + " compan" + (targets.length === 1 ? "y" : "ies")
+            : "";
+
+          setBubbleSectionMode(targets.length);
+
+          function hideTip() {
+            if (bubbleTip) {
+              bubbleTip.classList.remove("visible");
+              bubbleTip.setAttribute("aria-hidden", "true");
+            }
+          }
+          function hideCompact() {
+            if (compactWrap) {
+              compactWrap.hidden = true;
+              compactWrap.classList.remove("visible");
+            }
+            var card = document.getElementById("bubbleCompactCard");
+            if (card) card.innerHTML = "";
+          }
+          function moveTip(ev) {
+            if (!bubbleTip || !bubbleTip.classList.contains("visible")) return;
+            var tw = 228;
+            var th = bubbleTip.offsetHeight || 100;
+            var pad = 14;
+            var x = ev.clientX + pad;
+            var y = ev.clientY + pad;
+            if (x + tw > window.innerWidth - 4) x = ev.clientX - tw - pad;
+            if (y + th > window.innerHeight - 4) y = ev.clientY - th - pad;
+            bubbleTip.style.left = x + "px";
+            bubbleTip.style.top = y + "px";
+          }
+          function showTip(ev, data) {
+            if (!bubbleTip) return;
+            var sk = data.statusKey;
+            var color = BUBBLE_COLORS[sk] || BUBBLE_COLORS.not_sent;
+            var sentLine = data.sent
+              ? '<div class="tip-line">Sent ' + escapeHtml(bubbleRelativeTime(data.sent)) + "</div>"
+              : '<div class="tip-line">No email sent yet</div>';
+            bubbleTip.innerHTML =
+              '<span class="tip-name">' +
+              escapeHtml(data.name || "—") +
+              "</span>" +
+              '<div class="tip-status"><span class="tip-dot" style="background:' +
+              color +
+              '"></span>' +
+              escapeHtml(bubbleStatusLabel(sk)) +
+              "</div>" +
+              (data.email ? '<div class="tip-line">' + escapeHtml(data.email) + "</div>" : "") +
+              (data.campaign !== "—"
+                ? '<div class="tip-line">Campaign: ' + escapeHtml(data.campaign) + "</div>"
+                : "") +
+              sentLine +
+              '<div class="tip-cta">Click slice → Pipeline</div>';
+            bubbleTip.classList.add("visible");
+            bubbleTip.setAttribute("aria-hidden", "false");
+            moveTip(ev);
+          }
+
+          if (!targets.length) {
+            bubbleWrap.hidden = true;
+            hideCompact();
+            bubbleEmpty.hidden = false;
+            svgEl.innerHTML = "";
+            hideTip();
+            return;
+          }
+
+          bubbleEmpty.hidden = true;
+          svgEl.innerHTML = "";
+          hideTip();
+
+          if (targets.length === 1) {
+            bubbleWrap.hidden = true;
+            renderBubbleCompactCard(targets[0], tenant);
+            return;
+          }
+
+          hideCompact();
+          bubbleWrap.hidden = false;
+
+          var cx = 100;
+          var cy = 100;
+          var R = 88;
+          var rInner = 54;
+          var n = targets.length;
+          var tau = Math.PI * 2;
+          var startBase = -Math.PI / 2;
+
+          var ns = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+          var rg = document.createElementNS("http://www.w3.org/2000/svg", "radialGradient");
+          rg.setAttribute("id", "bubbleDonutShine");
+          rg.setAttribute("cx", "38%");
+          rg.setAttribute("cy", "32%");
+          rg.setAttribute("r", "78%");
+          var s0 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+          s0.setAttribute("offset", "0%");
+          s0.setAttribute("stop-color", "rgba(255,255,255,0.35)");
+          var s1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+          s1.setAttribute("offset", "55%");
+          s1.setAttribute("stop-color", "rgba(255,255,255,0)");
+          rg.appendChild(s0);
+          rg.appendChild(s1);
+          ns.appendChild(rg);
+          svgEl.appendChild(ns);
+
+          for (var i = 0; i < n; i++) {
+            var T = targets[i];
+            var sk = bubbleStatusKey(T);
+            var name = targetCompanyNameBubble(T);
+            var fill = BUBBLE_COLORS[sk] || BUBBLE_COLORS.not_sent;
+            var a0 = startBase + (i / n) * tau;
+            var a1 = startBase + ((i + 1) / n) * tau;
+            var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", donutSlicePath(cx, cy, R, rInner, a0, a1));
+            path.setAttribute("fill", fill);
+            path.setAttribute("fill-opacity", "0.92");
+            path.classList.add("bubble-donut-slice");
+            path.setAttribute("role", "listitem");
+            path.setAttribute("tabindex", "0");
+            path.setAttribute(
+              "aria-label",
+              name + " — " + bubbleStatusLabel(sk) + ". Opens Pipeline.",
+            );
+
+            var data = {
+              name: name,
+              id: T.id,
+              statusKey: sk,
+              email: extractTargetEmailBubble(T),
+              campaign:
+                T.lastCampaignName != null && String(T.lastCampaignName).trim()
+                  ? String(T.lastCampaignName).trim()
+                  : "—",
+              sent:
+                T.lastEmailSentAt != null && String(T.lastEmailSentAt).trim()
+                  ? String(T.lastEmailSentAt).trim()
+                  : "",
+            };
+
+            (function (D) {
+              path.addEventListener("click", function () {
+                hideTip();
+                if (!D.id) return;
+                window.location.href =
+                  "/leads.html?view=pipeline&tenantId=" +
+                  encodeURIComponent(tenant) +
+                  "&focusTarget=" +
+                  encodeURIComponent(String(D.id).trim());
+              });
+              path.addEventListener("keydown", function (ke) {
+                if (ke.key === "Enter" || ke.key === " ") {
+                  ke.preventDefault();
+                  path.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+                }
+              });
+              path.addEventListener("mouseenter", function (ev) {
+                showTip(ev, D);
+              });
+              path.addEventListener("mousemove", moveTip);
+              path.addEventListener("mouseleave", hideTip);
+            })(data);
+
+            svgEl.appendChild(path);
+          }
+
+          /* Gloss overlay on whole ring */
+          var gloss = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          gloss.setAttribute("cx", String(cx));
+          gloss.setAttribute("cy", String(cy));
+          gloss.setAttribute("r", String((R + rInner) / 2));
+          gloss.setAttribute("fill", "url(#bubbleDonutShine)");
+          gloss.setAttribute("pointer-events", "none");
+          svgEl.appendChild(gloss);
+
+          /* Center hub label */
+          var hub = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          hub.setAttribute("x", String(cx));
+          hub.setAttribute("y", String(cy - 3));
+          hub.setAttribute("text-anchor", "middle");
+          hub.classList.add("bubble-donut-center-text");
+          hub.textContent = String(n);
+          svgEl.appendChild(hub);
+          var sub = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          sub.setAttribute("x", String(cx));
+          sub.setAttribute("y", String(cy + 10));
+          sub.setAttribute("text-anchor", "middle");
+          sub.classList.add("bubble-donut-center-sub");
+          sub.textContent = n === 1 ? "company" : "companies";
+          svgEl.appendChild(sub);
+        }
+
+        var __bubbleResizeT;
+        window.addEventListener("resize", function () {
+          clearTimeout(__bubbleResizeT);
+          __bubbleResizeT = setTimeout(function () {
+            if (__bubbleState.targets && __bubbleState.targets.length) {
+              renderBubblePack(__bubbleState.targets, __bubbleState.tenant);
+            }
+          }, 280);
+        });
+
+        document.getElementById("btnNewCampaign").addEventListener("click", openStartModal);
+        document.getElementById("btnCloseStartModal").addEventListener("click", closeStartModal);
+        document.getElementById("btnPickImport").addEventListener("click", function () {
+          closeStartModal();
+          openImportModal();
+        });
+        document.getElementById("btnPickWizard").addEventListener("click", function () {
+          closeStartModal();
+          openModal();
+        });
+        if (startBackdrop) {
+          startBackdrop.addEventListener("click", function (e) {
+            if (e.target === startBackdrop) closeStartModal();
+          });
+        }
+        document.getElementById("btnCloseImportModal").addEventListener("click", closeImportModal);
+        if (importBackdrop) {
+          importBackdrop.addEventListener("click", function (e) {
+            if (e.target === importBackdrop) closeImportModal();
+          });
+        }
+        var importKindRadios = document.querySelectorAll('input[name="importKind"]');
+        for (var ik = 0; ik < importKindRadios.length; ik++) {
+          importKindRadios[ik].addEventListener("change", syncImportKindUi);
+        }
+        syncImportKindUi();
+        document.getElementById("btnRunParse").addEventListener("click", runImportParse);
+        document.getElementById("btnConfirmImport").addEventListener("click", confirmImportNow);
+
+        /* ── Drag and drop for import file zone ── */
+        (function () {
+          var zone = document.getElementById("importDropZone");
+          var fileInput = document.getElementById("importFile");
+          var dropText = document.getElementById("importDropText");
+          if (!zone || !fileInput) return;
+
+          function setFileName(name) {
+            if (dropText) dropText.innerHTML = "✓ &nbsp;" + escapeHtml(name);
+            zone.classList.add("has-file");
+            zone.classList.remove("drag-over");
+          }
+
+          fileInput.addEventListener("change", function () {
+            if (fileInput.files && fileInput.files[0]) setFileName(fileInput.files[0].name);
+          });
+
+          zone.addEventListener("dragenter", function (e) {
+            e.preventDefault(); e.stopPropagation();
+            zone.classList.add("drag-over");
+          });
+          zone.addEventListener("dragover", function (e) {
+            e.preventDefault(); e.stopPropagation();
+            zone.classList.add("drag-over");
+          });
+          zone.addEventListener("dragleave", function (e) {
+            if (!zone.contains(e.relatedTarget)) zone.classList.remove("drag-over");
+          });
+          zone.addEventListener("drop", function (e) {
+            e.preventDefault(); e.stopPropagation();
+            zone.classList.remove("drag-over");
+            var files = e.dataTransfer && e.dataTransfer.files;
+            if (!files || !files[0]) return;
+            var dt = new DataTransfer();
+            dt.items.add(files[0]);
+            fileInput.files = dt.files;
+            setFileName(files[0].name);
+          });
+        })();
+        document.getElementById("btnCloseModal").addEventListener("click", closeModal);
+        modal.addEventListener("click", function (e) {
+          if (e.target === modal) closeModal();
+        });
+
+        document.getElementById("modeAi").addEventListener("click", function () {
+          setWriteMode("ai");
+        });
+        document.getElementById("modeLuke").addEventListener("click", function () {
+          setWriteMode("manual");
+        });
+
+        document.getElementById("btnLukeTemplate").addEventListener("click", function () {
+          var body = document.getElementById("kickBody");
+          if (!body) return;
+          body.value = MANUAL_TEMPLATE;
+          if (!document.getElementById("kickSubject").value.trim()) {
+            document.getElementById("kickSubject").value = "Partnership opportunity — Tech Jump";
+          }
+          setWriteMode("manual");
+        });
+
+        document.getElementById("btnStep1Next").addEventListener("click", function () {
+          var n = document.getElementById("campName").value.trim();
+          if (!n) {
+            showErr("Add a campaign name.");
+            return;
+          }
+          state.campaignName = n;
+          setStep(2);
+        });
+
+        document.getElementById("btnStep2Next").addEventListener("click", function () {
+          state.kickSubject = document.getElementById("kickSubject").value.trim();
+          state.kickBody = document.getElementById("kickBody").value.trim();
+          if (state.writeMode === "manual") {
+            if (!state.kickSubject || !state.kickBody) {
+              showErr("Add your subject and message before continuing (use the template button if helpful).");
+              return;
+            }
+          } else {
+            if (!state.kickSubject) {
+              state.kickSubject = "Intro — Tech Jump";
+              document.getElementById("kickSubject").value = state.kickSubject;
+            }
+            if (!state.kickBody) {
+              state.kickBody =
+                "[Placeholder — click Generate AI drafts on the last step, or type a starting paragraph here.]";
+              document.getElementById("kickBody").value = state.kickBody;
+            }
+          }
+          setStep(3);
+        });
+
+        document.getElementById("btnStep3Next").addEventListener("click", function () {
+          var pasted = parsePastedEmails(document.getElementById("pasteEmails").value);
+          state.leads = pasted;
+          var fileInput = document.getElementById("csvFile");
+          if (fileInput.files && fileInput.files[0]) {
+            showErr("Finish reading CSV…");
+            Papa.parse(fileInput.files[0], {
+              header: true,
+              skipEmptyLines: true,
+              complete: function (res) {
+                showErr("");
+                var rows = (res.data || []).map(function (row) {
+                  var lower = {};
+                  for (var k in row) {
+                    if (Object.prototype.hasOwnProperty.call(row, k)) {
+                      lower[String(k).trim().toLowerCase()] = row[k];
+                    }
+                  }
+                  function pick(keys) {
+                    for (var i = 0; i < keys.length; i++) {
+                      var kk = keys[i];
+                      if (lower[kk] != null && String(lower[kk]).trim()) {
+                        return String(lower[kk]).trim();
+                      }
+                    }
+                    return "";
+                  }
+                  return {
+                    email: pick(["email", "e-mail", "email address", "primary email"]).toLowerCase(),
+                    firstName: pick(["first name", "firstname"]),
+                    lastName: pick(["last name", "lastname"]),
+                    company: pick([
+                      "company name",
+                      "company name for emails",
+                      "company",
+                      "account name",
+                    ]),
+                    title: pick(["title", "job title"]),
+                    website: pick(["website", "company website", "web site", "domain"]),
+                  };
+                });
+                state.leads = mergeCsvLeads(rows);
+                finishStep3();
+              },
+              error: function (err) {
+                showErr(err && err.message ? err.message : "CSV error");
+              },
+            });
+            return;
+          }
+          finishStep3();
+        });
+
+        function finishStep3() {
+          if (!state.leads.length) {
+            showErr("Add at least one email or upload a CSV.");
+            return;
+          }
+          document.getElementById("importSummary").textContent =
+            state.leads.length + " recipient(s).";
+          renderLeadCards();
+          setStep(4);
+        }
+
+        document.querySelectorAll("[data-back]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            setStep(parseInt(btn.getAttribute("data-back"), 10));
+          });
+        });
+
+        document.getElementById("btnAiEnrich").addEventListener("click", async function () {
+          var btn = document.getElementById("btnAiEnrich");
+          syncCardsToState();
+          var fileInput = document.getElementById("csvFile");
+          var csvText = "";
+          function runEnrich(text) {
+            btn.disabled = true;
+            showErr("");
+            TJFetch("/api/campaigns/apollo-enrich", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                tenantId: getTenant(),
+                csvText: text,
+                maxRows: 20,
+              }),
+            })
+              .then(function (r) {
+                return r.json().then(function (body) {
+                  return { r: r, body: body };
+                });
+              })
+              .then(function (x) {
+                if (!x.r.ok) {
+                  showErr(x.body.error || "AI enrich failed");
+                  return;
+                }
+                var enriched = x.body.leads || [];
+                var byEmail = {};
+                for (var i = 0; i < enriched.length; i++) {
+                  byEmail[enriched[i].email] = enriched[i];
+                }
+                for (var j = 0; j < state.leads.length; j++) {
+                  var em = state.leads[j].email;
+                  if (byEmail[em]) {
+                    var E = byEmail[em];
+                    state.leads[j] = Object.assign({}, state.leads[j], {
+                      oneLiner: E.oneLiner || "",
+                      suggestedSubject: E.suggestedSubject || state.kickSubject,
+                      suggestedBody: E.suggestedBody || state.kickBody,
+                      enrichHintMessages: E.enrichHintMessages || [],
+                      enrichHints: E.enrichHints || [],
+                      website: E.website || state.leads[j].website,
+                    });
+                  }
+                }
+                renderLeadCards();
+                document.getElementById("sendStatus").textContent = "Drafts updated.";
+              })
+              .catch(function (e) {
+                showErr(e.message || String(e));
+              })
+              .finally(function () {
+                btn.disabled = false;
+              });
+          }
+          function csvEscape(v) {
+            var s = String(v == null ? "" : v);
+            if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+            return s;
+          }
+          if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function () {
+              runEnrich(String(reader.result || ""));
+            };
+            reader.readAsText(fileInput.files[0], "UTF-8");
+          } else {
+            var hdr = ["Email", "First Name", "Last Name", "Company Name", "Title", "Website"];
+            var lines = [hdr.join(",")];
+            for (var li = 0; li < state.leads.length; li++) {
+              var R = state.leads[li];
+              lines.push(
+                [
+                  csvEscape(R.email),
+                  csvEscape(R.firstName),
+                  csvEscape(R.lastName),
+                  csvEscape(R.company),
+                  csvEscape(R.title),
+                  csvEscape(R.website),
+                ].join(","),
+              );
+            }
+            runEnrich(lines.join("\n"));
+          }
+        });
+
+        document.getElementById("btnSendSelected").addEventListener("click", async function () {
+          readCardsFromDom();
+              var calendly = document.getElementById("calendlyLink").value.trim();
+          var aiOnEl = document.getElementById("aiSequenceEnabled");
+          var aiOn = aiOnEl ? aiOnEl.checked : true;
+          var modeEls = document.querySelectorAll('input[name="aiSendMode"]');
+          var aiMode = "manual_review";
+          for (var mi = 0; mi < modeEls.length; mi++) {
+            if (modeEls[mi].checked) aiMode = modeEls[mi].value;
+          }
+          var status = document.getElementById("sendStatus");
+          var toSend = state.leads.filter(function (L) {
+            return L.sendThis && L.email && L.suggestedSubject && L.suggestedBody;
+          });
+          if (!toSend.length) {
+            showErr("Check at least one row with subject and body.");
+            return;
+          }
+          status.textContent = "Sending…";
+          var ok = 0;
+          for (var i = 0; i < toSend.length; i++) {
+            var L = toSend[i];
+            try {
+              var payload = {
+                kind: "test",
+                tenantId: getTenant(),
+                campaignName: state.campaignName,
+                to: L.email,
+                subject: L.suggestedSubject,
+                text: L.suggestedBody,
+                calendlyLink: calendly || "https://calendly.com/tech-jump/30min",
+                aiSequence: aiOn,
+              };
+              if (aiOn) payload.aiSequenceSendMode = aiMode;
+              var res = await TJFetch("/api/email/preview", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              var body = await res.json().catch(function () {
+                return {};
+              });
+              if (res.ok && body.sent) ok++;
+              else {
+                status.textContent = (body.error || "Failed") + " (" + L.email + ")";
+                return;
+              }
+            } catch (e) {
+              status.textContent = e.message || String(e);
+              return;
+            }
+            await new Promise(function (r) {
+              setTimeout(r, 400);
+            });
+          }
+          status.textContent = "Sent " + ok + " message(s).";
+          closeModal();
+          loadBubbles();
+        });
+
+        TJAuth.init({
+          onGuest: TJAppGate.redirectGuest,
+          onAuthed: function () {
+            document.getElementById("auth-loading-root").hidden = true;
+            document.getElementById("app-root").hidden = false;
+            loadBubbles();
+            if (!window.__tjNotifPrefsCampaignsDone) {
+              window.__tjNotifPrefsCampaignsDone = true;
+              try {
+                if (window.TJUserPrefsSync && typeof window.TJUserPrefsSync.init === "function") {
+                  window.TJUserPrefsSync.init({
+                    tenantGetter: getTenant,
+                    checkboxId: "tjNotifOptInCampaigns",
+                    observeLocalStorageTenantKey: "leadsDashboardTenantId",
+                  });
+                }
+              } catch (e) {
+                try {
+                  console.warn("[campaigns] TJUserPrefsSync.init failed", e);
+                } catch (_) {}
+              }
+            }
+          },
+        });
+
+        (function syncAiKickoffRow() {
+          var cb = document.getElementById("aiSequenceEnabled");
+          var row = document.getElementById("aiSendModeRow");
+          if (!cb || !row) return;
+          function sync() {
+            row.style.opacity = cb.checked ? "1" : "0.45";
+            row.style.pointerEvents = cb.checked ? "" : "none";
+          }
+          cb.addEventListener("change", sync);
+          sync();
+        })();
+
+        TJShell.init({ page: "campaigns" });
+      })();
+    </script>
+    <script src="/theme.js" defer></script>
+  </body>
+</html>

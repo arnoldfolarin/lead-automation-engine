@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Sign in — Tech Jump Lead Automation" />
+    <title>Sign in — Tech Jump Lead Automation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      try {
+        var stored = localStorage.getItem("tech_jump_theme");
+        document.documentElement.setAttribute("data-theme", stored === "light" ? "light" : "dark");
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    </script>
+    <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/login.css" />
+  </head>
+  <body>
+    <div class="login-bg" aria-hidden="true">
+      <div class="login-bg__grid"></div>
+    </div>
+
+    <div class="login-topbar">
+      <button type="button" class="login-theme-toggle" data-theme-toggle aria-label="Switch theme">
+        <span class="tj-sidebar__theme-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </span>
+        <span class="tj-sidebar__theme-text">Light</span>
+      </button>
+    </div>
+
+    <div class="login-page" id="loginPage">
+      <div class="login-split">
+        <section class="login-hero" aria-label="Tech Jump">
+          <div class="login-hero__brand">
+            <div class="login-hero__logo" aria-hidden="true">TJ</div>
+            <div>
+              <div class="login-hero__name">Tech<span>Jump</span></div>
+              <div class="login-hero__product">Lead Automation Platform</div>
+            </div>
+          </div>
+          <h1>Tech Jump</h1>
+          <p class="login-hero__tagline">Creative Minds in Software Development</p>
+          <p class="login-hero__desc">
+            Your internal workspace for outreach, pipeline tracking, and AI-assisted follow-ups — built for the Tech Jump team.
+          </p>
+          <div class="login-trust" aria-label="Focus areas">
+            <span>Healthcare</span>
+            <span>Enterprise</span>
+            <span>AI</span>
+          </div>
+          <a class="login-hero__link" href="https://www.tech-jump.com/" target="_blank" rel="noopener noreferrer"
+            >Visit tech-jump.com →</a
+          >
+        </section>
+
+        <div class="login-card" id="loginCard">
+          <div class="success-sparkles" id="successSparkles" hidden aria-hidden="true"></div>
+
+          <div id="checkingState" class="login-checking" role="status">Checking session…</div>
+
+          <div id="signInState" hidden>
+            <h2 class="login-card__title">Sign in to your workspace</h2>
+            <p class="login-card__subtitle">
+              Use your Tech Jump Google account — <strong>@tech-jump.com</strong> or <strong>@techjump.com</strong>.
+            </p>
+            <p class="login-msg" id="loginMsg" role="alert"></p>
+            <p class="login-hint">
+              If you see <strong>Your connection isn’t private</strong> on a
+              <code>firebaseapp.com</code> address, your PC or network is blocking HTTPS (VPN, antivirus HTTPS scanning, proxy, or wrong clock). Try another network or correct the system date.
+            </p>
+            <button type="button" class="btn-google" id="btnGoogle">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              <span id="googleBtnText">Continue with Google</span>
+            </button>
+            <p class="login-fallback">
+              Pop-ups blocked?
+              <button type="button" id="btnRedirectGoogle">Full-page sign-in</button>
+              <span style="opacity: 0.85"> (reloads via Firebase)</span>
+            </p>
+          </div>
+
+          <div class="login-success" id="successState">
+            <div class="success-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
+                <polyline points="20 6 9 17 4 12" stroke-dasharray="30" stroke-dashoffset="0"/>
+              </svg>
+            </div>
+            <div class="success-text">You're in!</div>
+            <div class="success-sub">Taking you to your dashboard…</div>
+            <div class="redirect-bar">
+              <div class="redirect-bar-fill"></div>
+            </div>
+          </div>
+
+          <div class="login-error" id="errorState" role="alert" aria-live="assertive">
+            <div class="error-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="26" height="26" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
+            <div class="error-text" id="errorTitle">Access not allowed</div>
+            <div class="error-sub" id="errorBody"></div>
+            <div class="error-email" id="errorEmail" hidden></div>
+            <button type="button" class="btn-error-retry" id="btnErrorRetry">Try again with Google</button>
+            <p class="error-help">
+              Need access?
+              <a href="mailto:info@tech-jump.com">Contact info@tech-jump.com</a>
+            </p>
+          </div>
+
+          <div class="login-footer">
+            <a href="https://www.tech-jump.com/" target="_blank" rel="noopener noreferrer">tech-jump.com</a>
+            &nbsp;·&nbsp;
+            <a href="mailto:info@tech-jump.com">info@tech-jump.com</a>
+            <br />
+            Tech Jump &copy; 2026
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/init.js" onerror="window.__tjFirebaseInitFailed = true;"></script>
+    <script src="/js/auth-gate.js"></script>
+    <script>
+    (function () {
+      var checkEl   = document.getElementById("checkingState");
+      var signInEl  = document.getElementById("signInState");
+      var successEl = document.getElementById("successState");
+      var errorEl   = document.getElementById("errorState");
+      var errorTitleEl = document.getElementById("errorTitle");
+      var errorBodyEl  = document.getElementById("errorBody");
+      var errorEmailEl = document.getElementById("errorEmail");
+      var btnErrorRetry = document.getElementById("btnErrorRetry");
+      var msgEl     = document.getElementById("loginMsg");
+      var btnGoogle = document.getElementById("btnGoogle");
+      var explicitSignInAttempt = false;
+
+      var ERROR_TITLES = {
+        domain: "Access not allowed",
+        unverified: "Email not verified",
+        timeout: "Session timed out",
+        firebase: "Sign-in unavailable",
+        sign_in: "Sign-in failed",
+        generic: "Something went wrong",
+      };
+
+      var HARD_ERROR_REASONS = {
+        domain: true,
+        unverified: true,
+        timeout: true,
+        firebase: true,
+        sign_in: true,
+        generic: true,
+      };
+
+      function readAuthFlash() {
+        var out = { message: "", reason: "", email: "" };
+        try {
+          out.message = (sessionStorage.getItem("tj_auth_flash") || "").trim();
+          out.reason = (sessionStorage.getItem("tj_auth_flash_reason") || "").trim();
+          out.email = (sessionStorage.getItem("tj_auth_flash_email") || "").trim();
+          sessionStorage.removeItem("tj_auth_flash");
+          sessionStorage.removeItem("tj_auth_flash_reason");
+          sessionStorage.removeItem("tj_auth_flash_email");
+        } catch (e) {}
+        return out;
+      }
+
+      function clearCardModes() {
+        var card = document.getElementById("loginCard");
+        var page = document.getElementById("loginPage");
+        var sparks = document.getElementById("successSparkles");
+        if (card) {
+          card.classList.remove("login-card--success", "login-card--error");
+        }
+        if (page) page.classList.remove("login-page--burst");
+        if (sparks) sparks.hidden = true;
+        if (successEl) successEl.classList.remove("show");
+        if (errorEl) errorEl.classList.remove("show");
+      }
+
+      function getRedirectTarget() {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var next = params.get("next");
+          if (next && next.startsWith("/") && !next.startsWith("//")) return next;
+        } catch (e) {}
+        return "/leads.html?view=dashboard";
+      }
+
+      function showSignIn(msg, isError) {
+        setLoading(false);
+        clearCardModes();
+        if (checkEl) checkEl.hidden = true;
+        if (signInEl) signInEl.hidden = false;
+        if (msgEl) {
+          if (msg) {
+            msgEl.textContent = msg;
+            msgEl.className = "login-msg " + (isError ? "error" : "info");
+          } else {
+            msgEl.textContent = "";
+            msgEl.className = "login-msg";
+          }
+        }
+      }
+
+      function showErrorState(opts) {
+        opts = opts || {};
+        setLoading(false);
+        clearCardModes();
+        if (checkEl) checkEl.hidden = true;
+        if (signInEl) signInEl.hidden = true;
+
+        var reason = opts.reason ? String(opts.reason).trim() : "generic";
+        if (!HARD_ERROR_REASONS[reason]) reason = "generic";
+        var title = ERROR_TITLES[reason] || ERROR_TITLES.generic;
+        var body =
+          (opts.message && String(opts.message).trim()) ||
+          (window.TJAuth && TJAuth.reasonMessages && TJAuth.reasonMessages[reason]) ||
+          (window.TJAuth && TJAuth.reasonMessages && TJAuth.reasonMessages.generic) ||
+          "Sign-in could not be completed. Please try again.";
+        var email = opts.email ? String(opts.email).trim() : "";
+
+        if (errorTitleEl) errorTitleEl.textContent = title;
+        if (errorBodyEl) errorBodyEl.textContent = body;
+        if (errorEmailEl) {
+          if (email) {
+            errorEmailEl.textContent = "You signed in as " + email;
+            errorEmailEl.hidden = false;
+          } else {
+            errorEmailEl.textContent = "";
+            errorEmailEl.hidden = true;
+          }
+        }
+
+        var card = document.getElementById("loginCard");
+        if (card) card.classList.add("login-card--error");
+        if (errorEl) errorEl.classList.add("show");
+      }
+
+      function showSuccess() {
+        clearCardModes();
+        if (checkEl) checkEl.hidden = true;
+        if (signInEl) signInEl.hidden = true;
+        if (successEl) successEl.classList.add("show");
+        var card = document.getElementById("loginCard");
+        var page = document.getElementById("loginPage");
+        var sparks = document.getElementById("successSparkles");
+        if (card) card.classList.add("login-card--success");
+        if (page) page.classList.add("login-page--burst");
+        if (sparks) sparks.hidden = false;
+        setTimeout(function () {
+          window.location.replace(getRedirectTarget());
+        }, 1950);
+      }
+
+      function setLoading(on) {
+        if (!btnGoogle) return;
+        btnGoogle.disabled = on;
+        if (on) {
+          btnGoogle.innerHTML =
+            '<span class="spinner"></span><span>Signing in…</span>';
+        } else {
+          btnGoogle.innerHTML =
+            '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>' +
+            '<span>Continue with Google</span>';
+        }
+      }
+
+      function firebaseDidInitialize() {
+        try {
+          if (typeof firebase === "undefined") return false;
+          if (!firebase.apps || firebase.apps.length === 0) return false;
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      try {
+        if (sessionStorage.getItem("tj_login_explicit") === "1") {
+          explicitSignInAttempt = true;
+          sessionStorage.removeItem("tj_login_explicit");
+        }
+      } catch (e0) {}
+
+      var pendingFlash = readAuthFlash();
+
+      function handleGuest(opts) {
+        opts = opts || {};
+        var flashMsg = pendingFlash.message;
+        var flashReason = pendingFlash.reason;
+        var flashEmail = pendingFlash.email;
+        pendingFlash = { message: "", reason: "", email: "" };
+
+        var reason = (opts.reason && String(opts.reason).trim()) || flashReason;
+        var msg = flashMsg || ((opts.message && String(opts.message).trim()) || "");
+        var email = (opts.email && String(opts.email).trim()) || flashEmail;
+
+        if (reason && HARD_ERROR_REASONS[reason]) {
+          showErrorState({ reason: reason, message: msg, email: email });
+          return;
+        }
+        if (errorEl && errorEl.classList.contains("show")) return;
+        showSignIn(msg, !!msg);
+      }
+
+      if (btnErrorRetry) {
+        btnErrorRetry.addEventListener("click", function () {
+          showSignIn("", false);
+        });
+      }
+
+      TJAuth.init({
+        onGuest: handleGuest,
+        onAuthed: function () {
+          if (!explicitSignInAttempt) {
+            var dest = getRedirectTarget();
+            setTimeout(function () {
+              window.location.replace(dest);
+            }, 120);
+            return;
+          }
+          showSuccess();
+        },
+      });
+
+      if (pendingFlash.reason && HARD_ERROR_REASONS[pendingFlash.reason]) {
+        handleGuest({
+          reason: pendingFlash.reason,
+          message: pendingFlash.message,
+          email: pendingFlash.email,
+        });
+        pendingFlash = { message: "", reason: "", email: "" };
+      }
+
+      window.addEventListener("load", function () {
+        if (successEl && successEl.classList.contains("show")) return;
+        if (errorEl && errorEl.classList.contains("show")) return;
+        try {
+          if (typeof firebase !== "undefined" && firebase.auth && firebase.auth().currentUser) return;
+        } catch (e1) {}
+        if (window.__tjFirebaseInitFailed) {
+          showErrorState({
+            reason: "firebase",
+            message:
+              "Firebase config did not load (/__/firebase/init.js). Open this app from your Firebase Hosting URL (not as a local file). In DevTools → Network, confirm init.js returns 200.",
+          });
+          return;
+        }
+        if (!firebaseDidInitialize()) {
+          showErrorState({
+            reason: "firebase",
+            message:
+              "Firebase did not start (no default app). Usually /__/firebase/init.js is missing — deploy with Firebase Hosting or run the emulator. Allowed origins must include this site’s domain in Firebase Console → Authentication → Settings → Authorized domains.",
+          });
+        }
+      });
+
+      function mapGoogleSignInError(err) {
+        var code = err && err.code ? String(err.code) : "";
+        var detail = err && err.message ? String(err.message) : "";
+        if (code === "auth/popup-blocked" && detail) {
+          return detail;
+        }
+        if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+          return "Sign-in cancelled — try again when ready.";
+        }
+        if (code === "auth/network-request-failed") {
+          return "Network issue — check your connection, VPN, or firewall and retry.";
+        }
+        if (code === "auth/unauthorized-domain") {
+          return "This site’s domain is not authorized for Google sign-in. In Firebase Console → Authentication → Settings → Authorized domains, add: " + (location.hostname || "your domain") + " (and save).";
+        }
+        if (code === "auth/operation-not-allowed") {
+          return "Google sign-in is disabled for this Firebase project. Enable Google under Authentication → Sign-in method.";
+        }
+        if (code === "auth/account-exists-with-different-credential") {
+          return "That email is already linked to another sign-in method. Use Google with the same account or ask an admin.";
+        }
+        if (code === "auth/invalid-api-key" || code === "auth/api-key-not-valid") {
+          return "Invalid Firebase API key — check Firebase project config and redeploy.";
+        }
+        if (code === "auth/internal-error") {
+          return "Google sign-in internal error — retry, or try another browser; check Firebase status and OAuth consent screen.";
+        }
+        if (detail && detail.length < 220) {
+          return "Sign-in failed: " + detail;
+        }
+        return "Sign-in failed (" + (code || "unknown") + "). Try again or open DevTools → Console for details.";
+      }
+
+      var btnRedirectGoogle = document.getElementById("btnRedirectGoogle");
+      if (btnRedirectGoogle) {
+        btnRedirectGoogle.addEventListener("click", function () {
+          if (!firebaseDidInitialize()) {
+            showSignIn("Firebase is not ready. Reload and try again.", true);
+            return;
+          }
+          var warn =
+            "Full-page sign-in opens Firebase on google.firebaseapp.com. If your browser showed a privacy/certificate error before, fix your network or PC first (otherwise it will fail again).\n\nContinue?";
+          if (!window.confirm(warn)) return;
+          try {
+            sessionStorage.setItem("tj_login_explicit", "1");
+          } catch (eR) {}
+          TJAuth.signInWithGoogleRedirect().catch(function (err) {
+            showErrorState({
+              reason: "sign_in",
+              message: mapGoogleSignInError(err),
+            });
+          });
+        });
+      }
+
+      if (btnGoogle) {
+        btnGoogle.addEventListener("click", function () {
+          if (!firebaseDidInitialize()) {
+            showErrorState({
+              reason: "firebase",
+              message:
+                "Firebase is not ready. Reload the page. If this persists, /__/firebase/init.js must load from Firebase Hosting.",
+            });
+            return;
+          }
+          explicitSignInAttempt = true;
+          setLoading(true);
+          if (msgEl) { msgEl.className = "login-msg"; msgEl.textContent = ""; }
+          clearCardModes();
+          if (signInEl) signInEl.hidden = false;
+          if (checkEl) checkEl.hidden = true;
+          TJAuth.signInWithGoogle()
+            .catch(function (err) {
+              showErrorState({
+                reason: "sign_in",
+                message: mapGoogleSignInError(err),
+              });
+              try {
+                console.error("[login] Google sign-in error", err && err.code, err);
+              } catch (e2) {}
+            });
+        });
+      }
+    })();
+    </script>
+    <script src="/theme.js" defer></script>
+  </body>
+</html>
