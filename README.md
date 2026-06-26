@@ -2,6 +2,8 @@
 
 AI-powered B2B lead automation platform built solo during a software engineering internship at TechJump. The system ingests leads, generates personalized outreach with OpenAI, delivers email through SendGrid, tracks replies, and runs scheduled follow-up sequences. All lead events are logged in Firestore under tenant-scoped paths.
 
+The implementation is rather naive and I am sure it can be significiantly improved. Any contributions or suggestions are welcome :)
+
 ## Motivation
 
 Manual cold outreach does not scale. Sales teams need a system that can accept leads from multiple sources, draft context-aware messages, send on a schedule, and stop when a prospect replies. This project automates that loop while keeping human review in the loop for inbound replies and AI-generated drafts.
