@@ -1,10 +1,10 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Send outreach email ‚Äî Tech Jump Lead Automation" />
-    <title>One email ‚Äî Tech Jump</title>
+    <meta name="description" content="Send outreach email ó Lead Automation Engine" />
+    <title>One email ó Outreach Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -1237,7 +1237,7 @@
         display: none;
       }
       .email-accordion > summary::after {
-        content: "‚ñæ";
+        content: "?";
         color: var(--muted);
         font-size: 0.75rem;
         transition: transform 0.15s;
@@ -1571,7 +1571,7 @@
         margin: 0.5rem 0 0.75rem;
       }
 
-      /* Full-screen send overlay: TJ + loading, then ‚Äújoy‚Äù on real send */
+      /* Full-screen send overlay: TJ + loading, then ìjoyî on real send */
       .tj-send-overlay {
         position: fixed;
         inset: 0;
@@ -2052,7 +2052,7 @@
         font-weight: 700;
       }
       .email-token-details[open] .email-token-details__summary::before {
-        content: "‚àí ";
+        content: "- ";
       }
       .email-token-legend {
         margin: 0.35rem 0 0;
@@ -2549,7 +2549,7 @@
 
     <div id="auth-loading-root" class="wrap">
       <div class="sign-in-card">
-        <p role="status" aria-live="polite">Checking session‚Ä¶</p>
+        <p role="status" aria-live="polite">Checking sessionÖ</p>
       </div>
     </div>
 
@@ -2559,10 +2559,10 @@
 
       <div class="nav-row-email" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem">
         <span style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center">
-          <a class="nav" href="/campaigns.html">‚Üê Campaigns</a>
-          <a class="nav" href="/leads.html?view=pipeline">Pipeline ‚Üí</a>
+          <a class="nav" href="/campaigns.html">? Campaigns</a>
+          <a class="nav" href="/leads.html?view=pipeline">Pipeline ?</a>
         </span>
-        <button type="button" class="btn-outreach-log" id="btnOutreachSendHistory" title="Send history: this browser + account (Firestore) when the API is deployed ‚Äî same details as GMass campaign Details">
+        <button type="button" class="btn-outreach-log" id="btnOutreachSendHistory" title="Send history: this browser + account (Firestore) when the API is deployed ó same details as GMass campaign Details">
           Send history &amp; details
         </button>
       </div>
@@ -2574,13 +2574,13 @@
             <span class="email-pref-card__text">
               <span class="email-pref-card__title">Pipeline notifications</span>
               <span class="email-pref-card__desc">
-                In-app alerts for replies and AI sends ‚Äî same Firestore pref as <strong>leads.html</strong> for this tenant.
+                In-app alerts for replies and AI sends ó same Firestore pref as <strong>leads.html</strong> for this tenant.
               </span>
             </span>
           </label>
         </div>
         <div class="email-pref-card email-pref-card--safety" id="emailAiReviewHint">
-          <span class="email-pref-card__icon" aria-hidden="true">üõ°</span>
+          <span class="email-pref-card__icon" aria-hidden="true">??</span>
           <div class="email-pref-card__text">
             <span class="email-pref-card__title">Default safety</span>
             <span class="email-pref-card__desc">
@@ -2616,7 +2616,7 @@
             <input id="testTo" type="email" placeholder="name@company.com" autocomplete="email" />
           </div>
           <div id="autoLinkRow" class="auto-link-row" hidden>
-            <label for="autoLinkPick">Same email on multiple rows ‚Äî pick one</label>
+            <label for="autoLinkPick">Same email on multiple rows ó pick one</label>
             <select id="autoLinkPick" aria-label="Choose which Leads row to update"></select>
           </div>
           <p class="auto-link-hint" id="autoLinkHint"></p>
@@ -2633,30 +2633,30 @@
             </div>
           </div>
           <p class="email-bench-hint" id="aiComposeHint" style="font-size: 0.75rem; margin: -0.1rem 0 0.5rem; display: none" hidden>
-            Drafts use <code>{Greeting}</code> and are structured in paragraphs on behalf of the team. Your signature (name, your title, Office phone, Orlando, Calendly booking link, and Tech Jump logo ‚Äî no email address) is added automatically when the email sends. Rotate for another version; edit before sending.
+            Drafts use <code>{Greeting}</code> and are structured in paragraphs on behalf of the team. Your signature (name, your title, Office phone, Orlando, Calendly booking link, and Outreach Platform logo ó no email address) is added automatically when the email sends. Rotate for another version; edit before sending.
           </p>
           <textarea
             id="testBody"
             class="email-message-composer"
-            placeholder="Write your email, or click ‚ÄúAI: new draft‚Äù for a team-style, paragraphed draft (no em dashes)‚Ä¶"
+            placeholder="Write your email, or click ìAI: new draftî for a team-style, paragraphed draft (no em dashes)Ö"
             required
           ></textarea>
 
           <details class="email-accordion email-accordion--setup" id="emailSetupBlock" open>
-            <summary><span class="email-accordion__icon" aria-hidden="true">‚öô</span>Email brief &amp; setup</summary>
+            <summary><span class="email-accordion__icon" aria-hidden="true">?</span>Email brief &amp; setup</summary>
             <div class="email-accordion__body">
               <div class="email-brief" id="emailBriefRow">
                 <span class="email-brief__rail" aria-hidden="true"></span>
                 <div class="email-brief__inner">
                   <div class="email-brief__head">
                     <label for="emailOutreachVibe">Describe your email</label>
-                    <span class="email-brief__chip-badge">Private ¬∑ AI only</span>
+                    <span class="email-brief__chip-badge">Private ∑ AI only</span>
                   </div>
                   <div class="email-brief__composer">
                     <textarea
                       id="emailOutreachVibe"
                       rows="5"
-                      placeholder="e.g. We built a mobile app for HGreg ‚Äî keep it medium length, personal, mention they have no mobile app for a dealership their size. Sound like a friend who bought through them, not a sales pitch."
+                      placeholder="e.g. We built a mobile app for HGreg ó keep it medium length, personal, mention they have no mobile app for a dealership their size. Sound like a friend who bought through them, not a sales pitch."
                     ></textarea>
                   </div>
                   <div class="email-brief__controls">
@@ -2683,13 +2683,13 @@
                       <input type="checkbox" id="emailSaveDefaultVibe" />
                       Save as my default brief
                     </label>
-                    <p class="email-brief__hint">Recipients never see this ‚Äî it guides AI tone, length, and angle for this send. Uses proven B2B templates for structure, your brief for angle ‚Äî formatted with clear paragraphs.</p>
+                    <p class="email-brief__hint">Recipients never see this ó it guides AI tone, length, and angle for this send. Uses proven B2B templates for structure, your brief for angle ó formatted with clear paragraphs.</p>
                   </div>
                 </div>
               </div>
 
               <details class="email-advanced-setup">
-                <summary>Advanced ‚Äî templates &amp; auto-fill</summary>
+                <summary>Advanced ó templates &amp; auto-fill</summary>
                 <div class="email-advanced-setup__body">
                   <div class="email-template-row">
                     <div class="email-template-row__head">
@@ -2721,7 +2721,7 @@
                       type="button"
                       class="btn-ghost-slim"
                       id="btnAutoFillOutreachSetup"
-                      title="Fill templates, pain point, and opener only ‚Äî without generating the full email."
+                      title="Fill templates, pain point, and opener only ó without generating the full email."
                     >
                       Auto-fill setup only
                     </button>
@@ -2750,7 +2750,7 @@
                   </div>
                 </div>
                 <p class="email-personalize-bar__hint" id="emailPersonalizeHint">
-                  Used for <code>{CompanyName}</code> and <code>{City}</code>. If city is unknown, templates use generic wording ‚Äî no awkward gaps.
+                  Used for <code>{CompanyName}</code> and <code>{City}</code>. If city is unknown, templates use generic wording ó no awkward gaps.
                 </p>
               </div>
 
@@ -2776,7 +2776,7 @@
                 <textarea
                   id="emailIceBreaker"
                   rows="2"
-                  placeholder="Optional ‚Äî used as {IceBreaker} in templates"
+                  placeholder="Optional ó used as {IceBreaker} in templates"
                   style="min-height: 3.2rem"
                 ></textarea>
                 <div class="email-icebreaker-toolbar">
@@ -2788,7 +2788,7 @@
           </details>
 
           <details class="email-accordion email-accordion--signature" id="emailSignatureBlock" open>
-            <summary><span class="email-accordion__icon" aria-hidden="true">‚úâ</span>Signature &amp; campaign</summary>
+            <summary><span class="email-accordion__icon" aria-hidden="true">?</span>Signature &amp; campaign</summary>
             <div class="email-accordion__body">
               <label for="outreachSenderName">Your name (email signature)</label>
               <input
@@ -2797,10 +2797,10 @@
                 placeholder="Zain Lateef"
                 autocomplete="name"
                 required
-                title="Recipients see this name in their inbox and in 'Book a Calendly meeting with ‚Ä¶'"
+                title="Recipients see this name in their inbox and in 'Book a Calendly meeting with Ö'"
               />
               <p class="email-bench-hint" style="margin: -0.35rem 0 0.65rem; font-size: 0.78rem">
-                This is the sender name recipients see in their inbox and in your signature ‚Äî not the greeting line. Hover the field for where it appears.
+                This is the sender name recipients see in their inbox and in your signature ó not the greeting line. Hover the field for where it appears.
               </p>
 
               <label for="outreachSenderTitle">Your title</label>
@@ -2825,8 +2825,8 @@
               <input
                 id="calendlyLink"
                 type="url"
-                value="https://calendly.com/tech-jump/30min"
-                placeholder="https://calendly.com/tech-jump/30min"
+                value="https://calendly.com/example/30min"
+                placeholder="https://calendly.com/example/30min"
                 autocomplete="off"
               />
 
@@ -2842,7 +2842,7 @@
           </details>
 
           <details class="email-accordion" id="emailScheduleBlock" open>
-            <summary><span class="email-accordion__icon" aria-hidden="true">üóì</span>Schedule</summary>
+            <summary><span class="email-accordion__icon" aria-hidden="true">??</span>Schedule</summary>
             <div class="email-accordion__body">
               <div class="email-form-row">
                 <span>Time</span>
@@ -2855,11 +2855,11 @@
                   <option value="tomorrow_am">Tomorrow morning (8:00)</option>
                   <option value="tomorrow_pm">Tomorrow afternoon (1:00)</option>
                   <option value="tomorrow_ev">Tomorrow evening (7:00)</option>
-                  <option value="custom">Custom date &amp; time‚Ä¶</option>
+                  <option value="custom">Custom date &amp; timeÖ</option>
                 </select>
               </div>
               <div id="emailCustomSchedulePill" class="email-custom-pill" hidden>
-                <span>Scheduled:</span> <span id="emailCustomScheduleText">‚Äî</span>
+                <span>Scheduled:</span> <span id="emailCustomScheduleText">ó</span>
                 <button type="button" class="btn-ghost-slim" id="btnOpenScheduleModal" style="margin-top: 0.4rem">Edit custom date, time &amp; timezone</button>
               </div>
               <div class="email-inline-checks">
@@ -2902,7 +2902,7 @@
             <summary>Auto follow-up (AI + stages)</summary>
             <div class="email-accordion__body">
                             <p class="email-bench-hint" style="margin: 0 0 0.2rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted)">
-                If they don't reply, follow-up emails are drafted for your review on Pipeline ‚Äî nothing sends until you approve. Add the <strong>recipient's</strong> first name below for the greeting line (<code>{Greeting}</code>) ‚Äî not your signature name.
+                If they don't reply, follow-up emails are drafted for your review on Pipeline ó nothing sends until you approve. Add the <strong>recipient's</strong> first name below for the greeting line (<code>{Greeting}</code>) ó not your signature name.
               </p>
               <div class="email-form-row" style="margin-bottom: 0.15rem">
                 <span class="field-label-std" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 700; margin: 0 0 0.2rem; display: block"
@@ -2918,7 +2918,7 @@
                   Greeting for current recipient: <strong id="emailDirectorGreetingEx">Hey there,</strong>
                 </p>
                 <p class="email-bench-hint" id="emailSelfTestHint" hidden style="margin: 0.35rem 0 0; font-size: 0.78rem; color: var(--warn, #fbbf24)">
-                  Self-test: the To address matches a Tech Jump inbox ‚Äî the greeting may use your first name from that email address.
+                  Self-test: the To address matches a Outreach Platform inbox ó the greeting may use your first name from that email address.
                 </p>
               </div>
               <div class="email-ai-card" id="emailAiMasterCard">
@@ -2965,7 +2965,7 @@
                 + Add another follow-up stage
               </button>
               <p class="email-bench-hint" style="margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--muted)">
-                The first email sends immediately. Follow-ups only send <strong>if they haven't replied</strong> ‚Äî and only after you approve each one on Pipeline.
+                The first email sends immediately. Follow-ups only send <strong>if they haven't replied</strong> ó and only after you approve each one on Pipeline.
               </p>
             </div>
           </details>
@@ -2990,10 +2990,10 @@
               <span class="email-resolved-preview__for" id="emailResolvedPreviewFor">Add a To address or pick from Pipeline</span>
             </div>
             <p class="email-resolved-preview__warn" id="emailResolvedPreviewWarn" hidden></p>
-            <p class="email-resolved-preview__subj"><span>Subject: </span><span id="emailResolvedPreviewSubject">‚Äî</span></p>
-            <pre class="email-resolved-preview__body" id="emailResolvedPreviewBody">‚Äî</pre>
+            <p class="email-resolved-preview__subj"><span>Subject: </span><span id="emailResolvedPreviewSubject">ó</span></p>
+            <pre class="email-resolved-preview__body" id="emailResolvedPreviewBody">ó</pre>
             <p class="email-resolved-preview__sig" id="emailResolvedPreviewSigNote">
-              Signature (name, title, Office phone, Orlando, Calendly link, logo) is appended automatically when you send ‚Äî shown above in Signature preview.
+              Signature (name, title, Office phone, Orlando, Calendly link, logo) is appended automatically when you send ó shown above in Signature preview.
             </p>
           </div>
 
@@ -3005,7 +3005,7 @@
         <div class="result" id="resultTest" aria-live="polite"></div>
       </div>
 
-      <footer>Tech Jump Lead Automation</footer>
+      <footer>Lead Automation Engine</footer>
     </div>
 
     <div id="emailOutreachDetailsBd" class="email-details-backdrop" hidden aria-hidden="true">
@@ -3018,7 +3018,7 @@
       >
         <div class="email-details-head">
           <h2 id="emailOutreachDetailsTitle">Send details (log)</h2>
-          <button type="button" class="btn-close-ico" id="emailOutreachDetailsX" aria-label="Close">√ó</button>
+          <button type="button" class="btn-close-ico" id="emailOutreachDetailsX" aria-label="Close">◊</button>
         </div>
         <div class="email-details-body" id="emailOutreachDetailsBody"></div>
       </div>
@@ -3047,7 +3047,7 @@
             id="emailSchedModalX"
             aria-label="Close"
           >
-            √ó
+            ◊
           </button>
         </h3>
         <p class="email-bench-hint" style="margin: 0 0 0.4rem; font-size: 0.82rem; line-height: 1.5; color: var(--muted)">
@@ -3114,7 +3114,7 @@
       <div class="tj-exit-queue-dialog" role="dialog" aria-modal="true" aria-labelledby="exitInboundTitle">
         <h3 id="exitInboundTitle">Leave inbound queue?</h3>
         <p class="tj-exit-queue-msg">
-          Remaining recipients stay in Pipeline ‚Äî you can select them again from Pipeline.
+          Remaining recipients stay in Pipeline ó you can select them again from Pipeline.
         </p>
         <div class="tj-exit-queue-actions">
           <button type="button" class="tj-btn-stay" id="exitInboundStay">Stay</button>
@@ -3137,8 +3137,8 @@
             </div>
           </div>
         </div>
-        <p class="tj-send-msg" id="tjSendMsg">Sending your email‚Ä¶</p>
-        <span class="tj-send-sub" id="tjSendSub" hidden>Tech Jump</span>
+        <p class="tj-send-msg" id="tjSendMsg">Sending your emailÖ</p>
+        <span class="tj-send-sub" id="tjSendSub" hidden>Outreach Platform</span>
       </div>
     </div>
     <div id="tjSendConfirmBd" class="tj-send-confirm-backdrop" hidden aria-hidden="true">
@@ -3156,10 +3156,10 @@
       <div class="email-pipeline-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="emailPipelinePickerTitle">
         <div class="email-pipeline-picker-head">
           <h3 id="emailPipelinePickerTitle">Add from Pipeline</h3>
-          <button type="button" class="btn-close-ico" id="emailPipelinePickerClose" aria-label="Close">√ó</button>
+          <button type="button" class="btn-close-ico" id="emailPipelinePickerClose" aria-label="Close">◊</button>
         </div>
         <div class="email-pipeline-picker-tools">
-          <input type="search" id="emailPipelinePickerSearch" placeholder="Search company, email, or campaign‚Ä¶" autocomplete="off" />
+          <input type="search" id="emailPipelinePickerSearch" placeholder="Search company, email, or campaignÖ" autocomplete="off" />
           <button type="button" class="btn-ghost-slim" id="emailPipelinePickerSelectAll">Select all</button>
           <button type="button" class="btn-ghost-slim" id="emailPipelinePickerClearSel">Clear</button>
         </div>
@@ -3435,9 +3435,9 @@
 
       function formatOutreachLogOption(e) {
         var t = (e.recordedAt || "").replace("T", " ").slice(0, 19);
-        var c = (e.campaignName || "‚Äî").slice(0, 36);
-        var to = (e.to || (e.requestPayload && e.requestPayload.to) || "‚Äî").slice(0, 26);
-        return t + " ¬∑ " + c + " ¬∑ " + to;
+        var c = (e.campaignName || "ó").slice(0, 36);
+        var to = (e.to || (e.requestPayload && e.requestPayload.to) || "ó").slice(0, 26);
+        return t + " ∑ " + c + " ∑ " + to;
       }
 
       function formatOutreachDetailsBody(entry) {
@@ -3448,11 +3448,11 @@
         var sch = p.schedule || {};
         var stages = entry.followupStages != null ? entry.followupStages : p.aiFollowupStages || [];
         var aiOn = p.aiSequence === true;
-        var mode = p.aiSequenceSendMode || "‚Äî";
+        var mode = p.aiSequenceSendMode || "ó";
         var ta = p.inboundThreadAssist || {};
         var storageNote = "This browser (localStorage) only";
         if (entry._fromServer) {
-          storageNote = "Account log in Firestore ‚Äî same after sign-in on any device";
+          storageNote = "Account log in Firestore ó same after sign-in on any device";
         } else if (entry.serverId) {
           storageNote = "This browser, and Firestore id <code class=\"email-hint\">" + escOutreach(String(entry.serverId)) + "</code> (account log)";
         }
@@ -3476,7 +3476,7 @@
             "</dd>";
         }
         html += "<dt>Skip US federal holidays</dt><dd>" + (entry.skipUSFederalHolidays ? "Yes" : "No") + "</dd>";
-        html += "<dt>Only certain weekdays</dt><dd>" + (entry.limitToSpecificWeekdays ? "Yes ‚Äî " + (entry.sendOnDayOfWeekNameList || []).join(", ") : "No") + "</dd>";
+        html += "<dt>Only certain weekdays</dt><dd>" + (entry.limitToSpecificWeekdays ? "Yes ó " + (entry.sendOnDayOfWeekNameList || []).join(", ") : "No") + "</dd>";
         if (sch.sendSpacingSeconds != null) {
           html += "<dt>Send spacing (seconds)</dt><dd>" + escOutreach(String(sch.sendSpacingSeconds)) + "</dd>";
         }
@@ -3485,7 +3485,7 @@
         html +=
           "<dt>Inbound thread assist (reply handling)</dt><dd>" +
           (ta.enabled ? "On" : "Off") +
-          " ¬∑ require human if unsure: " +
+          " ∑ require human if unsure: " +
           (ta.requireHumanOnLowConfidence ? "Yes" : "No") +
           "</dd>";
         html += "</dl>";
@@ -3497,9 +3497,9 @@
             html +=
               "Stage " +
               escOutreach(String(st.stage)) +
-              " ¬∑ " +
+              " ∑ " +
               escOutreach(String(st.ifCondition)) +
-              " ¬∑ ";
+              " ∑ ";
             if (st.delayMinutesAfterPrior != null && String(st.delayMinutesAfterPrior).trim() !== "") {
               html +=
                 "wait " +
@@ -3509,7 +3509,7 @@
               html +=
                 "after " +
                 escOutreach(String(st.ifNoReplyAfterDays)) +
-                " day(s) ¬∑ at " +
+                " day(s) ∑ at " +
                 escOutreach(String(st.sendAtLocal));
               if (st.sendAtTimeZone) {
                 html += " (" + escOutreach(String(st.sendAtTimeZone)) + ")";
@@ -3539,7 +3539,7 @@
           return;
         }
         var tid = getComposeTenantId() || "default";
-        body.innerHTML = "<p class=\"email-details-hint\">Loading send log‚Ä¶</p>";
+        body.innerHTML = "<p class=\"email-details-hint\">Loading send logÖ</p>";
         openViewportModal(bd, null);
         getMergedOutreachLog(tid).then(function (list) {
           if (!list || !list.length) {
@@ -3663,7 +3663,7 @@
         if (body.targetUpdated) {
           statusLine = body.targetCreated
             ? "Added to your Pipeline as a new outreach contact."
-            : "Pipeline updated ‚Äî now waiting on their reply.";
+            : "Pipeline updated ó now waiting on their reply.";
         } else if (body.targetLookupError || body.targetUpdateError) {
           statusLine = '<span class="warn-inline">Email delivered, but pipeline update ran into an issue.</span>';
         }
@@ -3673,7 +3673,7 @@
           if (followupMeta.enabled && followupMeta.stageCount > 0) {
             if (followupMeta.mode === "manual_review") {
               followLine =
-                '<p class="sent-status sent-status--followup">Follow-ups: you chose <strong>Review each follow-up draft first</strong>. The next touch will <strong>not</strong> mail automatically ‚Äî when the backend creates a draft, approve it on <strong>Pipeline</strong> before it sends.</p>';
+                '<p class="sent-status sent-status--followup">Follow-ups: you chose <strong>Review each follow-up draft first</strong>. The next touch will <strong>not</strong> mail automatically ó when the backend creates a draft, approve it on <strong>Pipeline</strong> before it sends.</p>';
             } else {
               followLine =
                 '<p class="sent-status sent-status--followup">Follow-ups: <strong>' +
@@ -3692,12 +3692,12 @@
 
         var gmailLink = "";
         var deliveryNote =
-          '<p class="sent-status">Delivered via <strong>SendGrid</strong> from <strong>autoemailer@tech-jump.com</strong>. ' +
+          '<p class="sent-status">Delivered via <strong>SendGrid</strong> from <strong>noreply@example.com</strong>. ' +
           "Check the <strong>recipient's</strong> inbox (Spam/Promotions too). " +
           "It does not appear in your personal Gmail Sent folder.</p>";
         if (body.deliveryMode === "dry_run" || body.dryRun) {
           deliveryNote =
-            '<p class="sent-status warn-inline">Warning: server reported dry-run ‚Äî this message may not have been delivered.</p>';
+            '<p class="sent-status warn-inline">Warning: server reported dry-run ó this message may not have been delivered.</p>';
         } else if (body.messageId) {
           deliveryNote +=
             '<p class="sent-status" style="font-size:0.78rem;opacity:0.9">SendGrid ID: ' +
@@ -3721,7 +3721,7 @@
           deliveryNote +
           followLine +
           '<div class="sent-actions">' +
-          '<a href="' + escapeHtml(dashHref) + '" class="sent-action-link">View in Pipeline ‚Üí</a>' +
+          '<a href="' + escapeHtml(dashHref) + '" class="sent-action-link">View in Pipeline ?</a>' +
           gmailLink +
           '</div>' +
           '</div>';
@@ -3736,7 +3736,7 @@
             var bDet = document.createElement("button");
             bDet.type = "button";
             bDet.className = "btn-email-details";
-            bDet.textContent = "View this send‚Äôs details (settings log)";
+            bDet.textContent = "View this sendís details (settings log)";
             (function (lid) {
               bDet.addEventListener("click", function () {
                 openOutreachDetailsModal(lid);
@@ -3841,7 +3841,7 @@
         var info = classifyComposeError(msg, err);
         var html =
           '<div class="compose-error-screen" role="alert">' +
-          '<div class="compose-error-screen__icon" aria-hidden="true">‚ö†</div>' +
+          '<div class="compose-error-screen__icon" aria-hidden="true">?</div>' +
           "<h3 class=\"compose-error-screen__title\">" +
           escapeHtml(info.title) +
           "</h3>" +
@@ -3924,7 +3924,7 @@
         var m = document.getElementById("tjSendMsg");
         var s = document.getElementById("tjSendSub");
         if (m) {
-          m.textContent = "Sending your email‚Ä¶";
+          m.textContent = "Sending your emailÖ";
         }
         if (s) {
           s.hidden = true;
@@ -3965,7 +3965,7 @@
         var m = document.getElementById("tjSendMsg");
         var s = document.getElementById("tjSendSub");
         if (m) {
-          m.textContent = "Nice ‚Äî it‚Äôs on its way!";
+          m.textContent = "Nice ó itís on its way!";
         }
         if (s) {
           s.hidden = false;
@@ -3999,7 +3999,7 @@
         if (window.TJEmailTemplates && window.TJEmailTemplates.DEFAULT_OUTREACH_VIBE) {
           return String(window.TJEmailTemplates.DEFAULT_OUTREACH_VIBE);
         }
-        return "We're a SaaS company offering personalized outreach. Sound human and specific ‚Äî short paragraphs, one clear angle, no hype or obvious AI phrasing.";
+        return "We're a SaaS company offering personalized outreach. Sound human and specific ó short paragraphs, one clear angle, no hype or obvious AI phrasing.";
       }
 
       function readOutreachVibeValue() {
@@ -4071,18 +4071,18 @@
             var chip = document.createElement("span");
             chip.className = "email-recipient-chip" + (idx === 0 ? " is-active" : "");
             chip.title =
-              (it.directorName ? it.directorName + " ¬∑ " : "") + (it.companyName || it.email || "");
+              (it.directorName ? it.directorName + " ∑ " : "") + (it.companyName || it.email || "");
             var emailSpan = document.createElement("span");
             emailSpan.className = "email-recipient-chip__email";
-            emailSpan.textContent = it.email || "‚Äî";
+            emailSpan.textContent = it.email || "ó";
             var campSpan = document.createElement("span");
             campSpan.className = "email-recipient-chip__camp";
-            campSpan.textContent = "¬∑ " + getQueueCampaignLabel(it);
+            campSpan.textContent = "∑ " + getQueueCampaignLabel(it);
             var rm = document.createElement("button");
             rm.type = "button";
             rm.className = "email-recipient-chip__remove";
             rm.setAttribute("aria-label", "Remove recipient");
-            rm.textContent = "√ó";
+            rm.textContent = "◊";
             rm.addEventListener("click", function (ev) {
               ev.stopPropagation();
               removeQueueIndex(idx);
@@ -4117,7 +4117,7 @@
         if (note) note.hidden = true;
         var cur = emailBulkQueue[0];
         var co = ((cur && cur.companyName) || (cur && cur.email) || "Recipient").slice(0, 36);
-        txt.textContent = " ¬∑ 1 of " + n + " ¬∑ " + co + " ¬∑ " + (cur.email || "");
+        txt.textContent = " ∑ 1 of " + n + " ∑ " + co + " ∑ " + (cur.email || "");
         if (sendAllBtn) sendAllBtn.hidden = n <= 1;
         renderRecipientChips();
       }
@@ -4270,7 +4270,7 @@
         var to = payload && payload.to ? String(payload.to) : "";
         var company = payload && payload.companyName ? String(payload.companyName) : "";
         parts.push("Recipient: " + (to || company || "manual target"));
-        parts.push("Campaign: " + String(payload && payload.campaignName ? payload.campaignName : "‚Äî"));
+        parts.push("Campaign: " + String(payload && payload.campaignName ? payload.campaignName : "ó"));
         if (payload && payload.outreachSenderName) {
           parts.push("Signed by: " + String(payload.outreachSenderName));
         }
@@ -4377,7 +4377,7 @@
             " people? Each person gets their own name in greetings and follow-ups when available.";
           list.innerHTML =
             "<li>Campaign: " +
-            escapeHtml(campaignName || "‚Äî") +
+            escapeHtml(campaignName || "ó") +
             "</li><li>Recipients remaining: " +
             escapeHtml(String(count)) +
             "</li>";
@@ -4409,7 +4409,7 @@
         var senderTitleEl = document.getElementById("outreachSenderTitle");
         var outreachSenderName = senderNameEl ? String(senderNameEl.value || "").trim() : "";
         if (!outreachSenderName) {
-          return { error: "Your name is required ‚Äî it appears in the email signature." };
+          return { error: "Your name is required ó it appears in the email signature." };
         }
         var outreachSenderTitle = senderTitleEl
           ? String(senderTitleEl.value || "").trim() || "Account Lead"
@@ -4418,14 +4418,14 @@
         if (schedPreset && schedPreset.value === "custom" && (!__emailCustomSchedule || !__emailCustomSchedule.set)) {
           return {
             error:
-              "You chose a custom time ‚Äî use ‚ÄúEdit‚Äù to set date, time, and time zone, or pick another ‚ÄúTime‚Äù option.",
+              "You chose a custom time ó use ìEditî to set date, time, and time zone, or pick another ìTimeî option.",
           };
         }
         if (document.getElementById("emailChooseDays") && document.getElementById("emailChooseDays").checked) {
           var nChk = document.querySelectorAll('input[name="emailDow"]:checked').length;
           if (nChk === 0) {
             return {
-              error: "Choose at least one day of the week, or uncheck ‚ÄúChoose specific days of the week.‚Äù",
+              error: "Choose at least one day of the week, or uncheck ìChoose specific days of the week.î",
             };
           }
         }
@@ -4530,7 +4530,7 @@
           tjShowSendOverlaySending();
           var msgEl = document.getElementById("tjSendMsg");
           if (msgEl) {
-            msgEl.textContent = "Sending " + (sent + 1) + " of " + total + "‚Ä¶";
+            msgEl.textContent = "Sending " + (sent + 1) + " of " + total + "Ö";
           }
           var result = await postPreview(built.payload);
           if (!result.res.ok || !(result.body && result.body.sent)) {
@@ -4624,9 +4624,9 @@
             escapeHtml(it.companyName || it.email) +
             "</strong><span>" +
             escapeHtml(it.email) +
-            (it.campaignName ? " ¬∑ " + escapeHtml(it.campaignName) : "") +
-            (it.directorName ? " ¬∑ " + escapeHtml(it.directorName) : "") +
-            (it.city ? " ¬∑ " + escapeHtml(it.city) : "") +
+            (it.campaignName ? " ∑ " + escapeHtml(it.campaignName) : "") +
+            (it.directorName ? " ∑ " + escapeHtml(it.directorName) : "") +
+            (it.city ? " ∑ " + escapeHtml(it.city) : "") +
             "</span></div></label>";
         }
         listEl.innerHTML = shown
@@ -4644,7 +4644,7 @@
         openViewportModal(bd, search);
         var listEl = document.getElementById("emailPipelinePickerList");
         if (listEl) {
-          listEl.innerHTML = '<p class="email-bench-hint" style="padding:0.75rem;text-align:center">Loading pipeline‚Ä¶</p>';
+          listEl.innerHTML = '<p class="email-bench-hint" style="padding:0.75rem;text-align:center">Loading pipelineÖ</p>';
         }
         loadPipelinePickerTargets()
           .then(function () {
@@ -4819,11 +4819,11 @@
         updateDirectorGreetingPreview();
       }
 
-      function isTechJumpSelfTestEmail(addr) {
+      function isOutreachPlatformSelfTestEmail(addr) {
         var e = String(addr || "").trim().toLowerCase();
         if (!e || e.indexOf("@") < 1) return false;
         var dom = e.split("@")[1] || "";
-        return dom === "tech-jump.com" || dom === "techjump.com";
+        return dom === "example.com" || dom === "example.com";
       }
 
       function updateDirectorGreetingPreview() {
@@ -4851,7 +4851,7 @@
           } catch (_) {}
           var showSelf =
             email &&
-            isTechJumpSelfTestEmail(email) &&
+            isOutreachPlatformSelfTestEmail(email) &&
             (!senderEmail || email.toLowerCase() === senderEmail);
           selfHint.hidden = !showSelf;
         }
@@ -5070,9 +5070,9 @@
         if (forEl) {
           forEl.textContent = recipientLabel ? "For: " + recipientLabel : "Add a To address or pick from Pipeline";
         }
-        if (subPrev) subPrev.textContent = resolvedSub.trim() || "‚Äî";
+        if (subPrev) subPrev.textContent = resolvedSub.trim() || "ó";
         if (bodyPrev) {
-          bodyPrev.textContent = resolvedBody.trim() || "‚Äî";
+          bodyPrev.textContent = resolvedBody.trim() || "ó";
         }
         var unresolved = findUnresolvedTokens(resolvedSub).concat(findUnresolvedTokens(resolvedBody));
         var unique = [];
@@ -5087,12 +5087,12 @@
               : "";
           if (!readComposeCompanyValue() && derivedCo) {
             hintEl.textContent =
-              "No company on file ‚Äî using \"" +
+              "No company on file ó using \"" +
               derivedCo +
               "\" from the email domain. Edit Company above if that's wrong. City is optional.";
           } else if (!readComposeCityValue()) {
             hintEl.textContent =
-              "City is optional. Templates use generic wording when city is blank ‚Äî no awkward gaps in the preview.";
+              "City is optional. Templates use generic wording when city is blank ó no awkward gaps in the preview.";
           } else {
             hintEl.textContent =
               "Used for {CompanyName} and {City}. Edit above to adjust preview and send.";
@@ -5169,7 +5169,7 @@
         var dn = document.getElementById("emailDirectorName");
         var comp = co && co.value ? String(co.value).trim() : readComposeCompanyValue();
         var name = dn && dn.value ? String(dn.value).trim() : "";
-        var sl = comp.length > 48 ? comp.slice(0, 45) + "‚Ä¶" : comp;
+        var sl = comp.length > 48 ? comp.slice(0, 45) + "Ö" : comp;
         var pool = tjBuildKickoffPool(name, comp, sl);
         return pool[rot % pool.length];
       }
@@ -5275,7 +5275,7 @@
         if (legend && tpl.TOKEN_LEGEND) legend.textContent = "Tokens: " + tpl.TOKEN_LEGEND;
         var ibSel = document.getElementById("emailIcebreakerTemplate");
         if (ibSel && tpl.ICEBREAKER_TEMPLATES) {
-          ibSel.innerHTML = '<option value="">Icebreaker style‚Ä¶</option>';
+          ibSel.innerHTML = '<option value="">Icebreaker styleÖ</option>';
           for (var ii = 0; ii < tpl.ICEBREAKER_TEMPLATES.length; ii++) {
             var ib = tpl.ICEBREAKER_TEMPLATES[ii];
             var ibOpt = document.createElement("option");
@@ -5303,7 +5303,7 @@
           });
         }
         if (subSel && tpl.SUBJECT_TEMPLATES) {
-          subSel.innerHTML = '<option value="">Choose subject template‚Ä¶</option>';
+          subSel.innerHTML = '<option value="">Choose subject templateÖ</option>';
           for (var i = 0; i < tpl.SUBJECT_TEMPLATES.length; i++) {
             var s = tpl.SUBJECT_TEMPLATES[i];
             var opt = document.createElement("option");
@@ -5314,7 +5314,7 @@
           }
         }
         if (bodySel && tpl.KICKOFF_BODIES) {
-          bodySel.innerHTML = '<option value="">Choose body template‚Ä¶</option>';
+          bodySel.innerHTML = '<option value="">Choose body templateÖ</option>';
           for (var j = 0; j < tpl.KICKOFF_BODIES.length; j++) {
             var b = tpl.KICKOFF_BODIES[j];
             var opt2 = document.createElement("option");
@@ -5352,15 +5352,15 @@
 
       var __emailCustomSchedule = { set: false, date: "", time: "", timeZone: "America/New_York" };
       var EMAIL_TZ_LIST = [
-        { v: "America/New_York", l: "Eastern ‚Äî New York" },
-        { v: "America/Chicago", l: "Central ‚Äî Chicago" },
-        { v: "America/Denver", l: "Mountain ‚Äî Denver" },
-        { v: "America/Los_Angeles", l: "Pacific ‚Äî Los Angeles" },
-        { v: "America/Phoenix", l: "Arizona ‚Äî Phoenix" },
+        { v: "America/New_York", l: "Eastern ó New York" },
+        { v: "America/Chicago", l: "Central ó Chicago" },
+        { v: "America/Denver", l: "Mountain ó Denver" },
+        { v: "America/Los_Angeles", l: "Pacific ó Los Angeles" },
+        { v: "America/Phoenix", l: "Arizona ó Phoenix" },
         { v: "America/Anchorage", l: "Alaska" },
         { v: "Pacific/Honolulu", l: "Hawaii" },
-        { v: "America/Toronto", l: "Eastern ‚Äî Toronto" },
-        { v: "Europe/London", l: "UK ‚Äî London" },
+        { v: "America/Toronto", l: "Eastern ó Toronto" },
+        { v: "Europe/London", l: "UK ó London" },
         { v: "UTC", l: "UTC" },
       ];
 
@@ -5457,8 +5457,8 @@
         if (lab) {
           var parts = d.value.split("-");
           var nice =
-            (parts[1] || "") + "/" + (parts[2] || "") + "/" + (parts[0] || d.value) + " ¬∑ " + t.value;
-          nice += " ¬∑ " + __emailCustomSchedule.timeZone;
+            (parts[1] || "") + "/" + (parts[2] || "") + "/" + (parts[0] || d.value) + " ∑ " + t.value;
+          nice += " ∑ " + __emailCustomSchedule.timeZone;
           lab.textContent = nice;
         }
         var pill = document.getElementById("emailCustomSchedulePill");
@@ -5477,7 +5477,7 @@
         pill.hidden = false;
         if (!__emailCustomSchedule || !__emailCustomSchedule.set) {
           var lab = document.getElementById("emailCustomScheduleText");
-          if (lab) lab.textContent = "Not set ‚Äî use Edit to choose date, time, and time zone";
+          if (lab) lab.textContent = "Not set ó use Edit to choose date, time, and time zone";
         } else {
           var lab2 = document.getElementById("emailCustomScheduleText");
           if (lab2) {
@@ -5488,9 +5488,9 @@
               (parts2[2] || "") +
               "/" +
               (parts2[0] || __emailCustomSchedule.date) +
-              " ¬∑ " +
+              " ∑ " +
               __emailCustomSchedule.time +
-              " ¬∑ " +
+              " ∑ " +
               __emailCustomSchedule.timeZone;
           }
         }
@@ -5571,7 +5571,7 @@
         if (window.TJEmailTemplates && window.TJEmailTemplates.DEFAULT_CALENDLY_LINK) {
           return window.TJEmailTemplates.DEFAULT_CALENDLY_LINK;
         }
-        return "https://calendly.com/tech-jump/30min";
+        return "https://calendly.com/example/30min";
       }
 
       async function calendlyLinkPrefsSave(tenantId, link) {
@@ -5644,28 +5644,28 @@
         var s = tjSignOff();
         var co = c && sc ? sc : "your org";
         return [
-          {subject: c ? "Quick intro ‚Äî " + sc : "Introduction from the Tech Jump team", body: g + "\n\nI am writing on behalf of our team. We partner with orgs in your space on outreach and revenue motion.\n\nIf a 15 to 20 minute call would be useful, we are glad to work around your calendar.\n\n" + s},
-          {subject: c ? "Re: " + sc + " ‚Äî a thought" : "A short note from Tech Jump", body: g + "\n\nOur team wanted to connect in case project support or a partnership could help what you are building. We have supported similar teams with a structured, light-touch approach.\n\nIf you are open to it, we can propose a time that fits or follow your lead on next step.\n\n" + s},
-          {subject: c ? "Following up ‚Äî " + sc : "Following up from the team", body: g + "\n\nThe Tech Jump team is reaching out to see whether a conversation about your pipeline and outreach would be timely.\n\nWe are flexible on format and are happy to start with a brief call or email, whichever you prefer.\n\n" + s},
-          {subject: c ? sc + " ‚Äî a brief hello" : "A brief hello from the team", body: g + "\n\nWe are a team focused on lead generation and go-to-market support for growth-stage companies. We may be a fit as you plan the next few quarters.\n\nIf useful, I can share a one-page view of how we work, or we can jump to a short call at your convenience.\n\n" + s},
-          {subject: c ? "Partnership: " + sc : "Exploring a partnership", body: g + "\n\nOn behalf of Tech Jump, I wanted to surface our services in case partnership or a scoped project aligns with your roadmap.\n\nWe are happy to align with procurement or a technical lead, depending on how you like to evaluate vendors.\n\n" + s},
-          {subject: c ? "Circling re: " + sc : "Circling on a quick chat", body: g + "\n\nI am part of the Tech Jump team. We help teams like yours with outbound and follow-through so the pipeline stays full without adding headcount overnight.\n\nA short sync would help us both see fit; happy to work around your schedule.\n\n" + s},
+          {subject: c ? "Quick intro ó " + sc : "Introduction from the outreach team", body: g + "\n\nI am writing on behalf of our team. We partner with orgs in your space on outreach and revenue motion.\n\nIf a 15 to 20 minute call would be useful, we are glad to work around your calendar.\n\n" + s},
+          {subject: c ? "Re: " + sc + " ó a thought" : "A short note from Outreach Platform", body: g + "\n\nOur team wanted to connect in case project support or a partnership could help what you are building. We have supported similar teams with a structured, light-touch approach.\n\nIf you are open to it, we can propose a time that fits or follow your lead on next step.\n\n" + s},
+          {subject: c ? "Following up ó " + sc : "Following up from the team", body: g + "\n\nThe outreach team is reaching out to see whether a conversation about your pipeline and outreach would be timely.\n\nWe are flexible on format and are happy to start with a brief call or email, whichever you prefer.\n\n" + s},
+          {subject: c ? sc + " ó a brief hello" : "A brief hello from the team", body: g + "\n\nWe are a team focused on lead generation and go-to-market support for growth-stage companies. We may be a fit as you plan the next few quarters.\n\nIf useful, I can share a one-page view of how we work, or we can jump to a short call at your convenience.\n\n" + s},
+          {subject: c ? "Partnership: " + sc : "Exploring a partnership", body: g + "\n\nOn behalf of Outreach Platform, I wanted to surface our services in case partnership or a scoped project aligns with your roadmap.\n\nWe are happy to align with procurement or a technical lead, depending on how you like to evaluate vendors.\n\n" + s},
+          {subject: c ? "Circling re: " + sc : "Circling on a quick chat", body: g + "\n\nI am part of the outreach team. We help teams like yours with outbound and follow-through so the pipeline stays full without adding headcount overnight.\n\nA short sync would help us both see fit; happy to work around your schedule.\n\n" + s},
           {subject: c ? "Worth a quick look: " + sc : "Worth a quick look", body: g + "\n\nThe team and I are reaching out because we believe our work may complement " + co + " as you scale client acquisition.\n\nWe can keep the first touch brief and only go deeper if there is interest on your side.\n\n" + s},
-          {subject: c ? "Intro request ‚Äî " + sc : "Introduction request", body: g + "\n\nI am writing from Tech Jump. We have helped peer organizations with outreach, sequencing, and light CRM hygiene so the team can focus on closing.\n\nIf a 20 minute intro call is reasonable in the next week or two, we will make it easy to book.\n\n" + s},
+          {subject: c ? "Intro request ó " + sc : "Introduction request", body: g + "\n\nI am writing from Outreach Platform. We have helped peer organizations with outreach, sequencing, and light CRM hygiene so the team can focus on closing.\n\nIf a 20 minute intro call is reasonable in the next week or two, we will make it easy to book.\n\n" + s},
           {subject: c ? "Your goals at " + sc : "Your goals and our work", body: g + "\n\nOn our side, the team focuses on making first meetings easier to get and follow-ups less manual. We thought that might line up with what you are solving for in market.\n\nWe can share examples or start with a simple discovery call, no pressure either way.\n\n" + s},
-          {subject: c ? "Tech Jump + " + sc : "A note on how we can help", body: g + "\n\nTech Jump works as a small, senior team. We are used to working alongside marketing and sales and keeping messaging consistent with your brand.\n\nIf the timing is not right, a quick no or a point to the right person still helps us a lot.\n\n" + s},
-          {subject: c ? "Q2 outreach ‚Äî " + sc : "Outreach support for your team", body: g + "\n\nOur team is actively speaking with orgs in your space about stronger outbound and more predictable top-of-funnel. We can tailor tone and list strategy to your ICP.\n\nHappy to start with a short call or, if you prefer, a one-pager and then decide.\n\n" + s},
-          {subject: c ? "Meeting? ‚Äî " + sc : "A possible meeting", body: g + "\n\nI hope it is all right to ask for a brief meeting. The Tech Jump team can walk you through what we have seen work for companies at a similar stage.\n\nWe will keep it concise and you can set the next step, including none at all, if that is the honest answer.\n\n" + s},
+          {subject: c ? "Outreach Platform + " + sc : "A note on how we can help", body: g + "\n\nOutreach Platform works as a small, senior team. We are used to working alongside marketing and sales and keeping messaging consistent with your brand.\n\nIf the timing is not right, a quick no or a point to the right person still helps us a lot.\n\n" + s},
+          {subject: c ? "Q2 outreach ó " + sc : "Outreach support for your team", body: g + "\n\nOur team is actively speaking with orgs in your space about stronger outbound and more predictable top-of-funnel. We can tailor tone and list strategy to your ICP.\n\nHappy to start with a short call or, if you prefer, a one-pager and then decide.\n\n" + s},
+          {subject: c ? "Meeting? ó " + sc : "A possible meeting", body: g + "\n\nI hope it is all right to ask for a brief meeting. The outreach team can walk you through what we have seen work for companies at a similar stage.\n\nWe will keep it concise and you can set the next step, including none at all, if that is the honest answer.\n\n" + s},
           {subject: c ? "A fit for " + sc + "?" : "A quick fit check", body: g + "\n\nWe do not know yet if we are the right partner, and that is fine. We are asking for a short call so you can size us in one sitting.\n\nWe will bring a point of view and a few options, and you can tell us what matches reality on your end.\n\n" + s},
           {subject: c ? "Coordination re: " + sc : "Coordination on next steps", body: g + "\n\nFrom the team, we are happy to coordinate with whoever handles partnerships or new vendors on your side. We can work through email first if that is easier.\n\nA single thread with a clear next step is often enough to see if this goes further.\n\n" + s},
-          {subject: c ? "Pipeline ‚Äî " + sc : "Your pipeline and our work", body: g + "\n\nI am with Tech Jump, where the team helps fill and nurture pipeline without your internal team living in spreadsheets. If that is on your mind this quarter, we would like to help you evaluate the tradeoffs.\n\nA short conversation usually clarifies whether we are useful or a pass.\n\n" + s},
-          {subject: c ? "A calm intro ‚Äî " + sc : "A calm introduction", body: g + "\n\nThis is a friendly note from the Tech Jump team. We try to be direct and low noise: if outreach or follow-up automation would help, we are here. If not, a one-line reply saves us time too.\n\nIf there is a better contact, a forward is very welcome.\n\n" + s},
+          {subject: c ? "Pipeline ó " + sc : "Your pipeline and our work", body: g + "\n\nI am with Outreach Platform, where the team helps fill and nurture pipeline without your internal team living in spreadsheets. If that is on your mind this quarter, we would like to help you evaluate the tradeoffs.\n\nA short conversation usually clarifies whether we are useful or a pass.\n\n" + s},
+          {subject: c ? "A calm intro ó " + sc : "A calm introduction", body: g + "\n\nThis is a friendly note from the outreach team. We try to be direct and low noise: if outreach or follow-up automation would help, we are here. If not, a one-line reply saves us time too.\n\nIf there is a better contact, a forward is very welcome.\n\n" + s},
           {subject: c ? "Growth + " + sc : "Growth and GTM", body: g + "\n\nOur team supports growth and GTM leaders who need the outbound motion to work without a big lift from engineering or ops. We keep implementation practical.\n\nWe can start with a short scoping call or, if you prefer, answer a few questions over email first.\n\n" + s},
-          {subject: c ? "Touch base ‚Äî " + sc : "Touching base from Tech Jump", body: g + "\n\nTouching base from Tech Jump. We are seeing strong results when teams line up a clear ICP, simple messaging, and a steady follow-up cadence, and we help execute that on your behalf.\n\nWe would enjoy hearing what you are already doing and where the gaps feel largest.\n\n" + s},
-          {subject: c ? "Curious: " + sc : "A curious note from the team", body: g + "\n\nWe are curious whether " + (c ? sc : "your org") + " is exploring outside help for outbound or SDR support this year. The Tech Jump team is built for that, with account leads who stay on your thread from day one.\n\nIf it is a no, that is still useful to know, and we will close the loop on our end.\n\n" + s},
-          {subject: c ? "Short ask ‚Äî " + sc : "A short ask from our team", body: g + "\n\nShort ask: could we get 20 minutes in the next two weeks to see if a collaboration makes sense? Our team is flexible and can send a few slots or take yours.\n\nWe respect that your time is limited and we will not drag the first call longer than agreed.\n\n" + s},
+          {subject: c ? "Touch base ó " + sc : "Touching base from Outreach Platform", body: g + "\n\nTouching base from Outreach Platform. We are seeing strong results when teams line up a clear ICP, simple messaging, and a steady follow-up cadence, and we help execute that on your behalf.\n\nWe would enjoy hearing what you are already doing and where the gaps feel largest.\n\n" + s},
+          {subject: c ? "Curious: " + sc : "A curious note from the team", body: g + "\n\nWe are curious whether " + (c ? sc : "your org") + " is exploring outside help for outbound or SDR support this year. The outreach team is built for that, with account leads who stay on your thread from day one.\n\nIf it is a no, that is still useful to know, and we will close the loop on our end.\n\n" + s},
+          {subject: c ? "Short ask ó " + sc : "A short ask from our team", body: g + "\n\nShort ask: could we get 20 minutes in the next two weeks to see if a collaboration makes sense? Our team is flexible and can send a few slots or take yours.\n\nWe respect that your time is limited and we will not drag the first call longer than agreed.\n\n" + s},
           {subject: c ? "GTM at " + sc : "GTM and outreach", body: g + "\n\nGTM and outreach is where our team lives day to day. We thought it might be worth comparing notes with you and your org, at least once.\n\nWe can show a small sample of plays we run for similar companies and you can tell us if it is in the right ballpark.\n\n" + s},
-          {subject: c ? "Hello from the team re: " + sc : "Hello from the Tech Jump team", body: g + "\n\nHello from the Tech Jump team. We are writing because we would rather ask once clearly than miss a chance to be useful.\n\nIf a conversation is worth having, we will work around you. If not, no hard feelings and we appreciate your time in reading this.\n\n" + s},
+          {subject: c ? "Hello from the team re: " + sc : "Hello from the outreach team", body: g + "\n\nHello from the outreach team. We are writing because we would rather ask once clearly than miss a chance to be useful.\n\nIf a conversation is worth having, we will work around you. If not, no hard feelings and we appreciate your time in reading this.\n\n" + s},
         ];
       }
 
@@ -5681,23 +5681,23 @@
         return [
           "{Greeting}\n\nCircling back in case this got buried. Our team is still very interested in a short conversation if the timing is better now.\n\n" + so,
           "{Greeting}\n\nFollowing up once: we have not heard back and know inboxes are full. A quick yes, no, or a better point of contact still helps us a lot.\n\n" + so,
-          "{Greeting}\n\nA gentle nudge from the Tech Jump team. We would value 15 minutes when you can, or a line on whether we should check back in a few weeks instead.\n\n" + so,
+          "{Greeting}\n\nA gentle nudge from the outreach team. We would value 15 minutes when you can, or a line on whether we should check back in a few weeks instead.\n\n" + so,
           "{Greeting}\n\nChecking in. If outreach support is on your roadmap this period, we are here to make the first call easy, no heavy deck required.\n\n" + so,
           "{Greeting}\n\nQuick follow-up from the team. If now is not the time, a one-sentence note means we can pause and respect your focus.\n\n" + so,
           "{Greeting}\n\nStill on our side: we would like to help if there is a fit. Happy to work around a busy calendar with a few concrete time options on request.\n\n" + so,
-          "{Greeting}\n\nSecond touch from Tech Jump. We are keeping this short on purpose, we know you are juggling priorities.\n\n" + so,
+          "{Greeting}\n\nSecond touch from Outreach Platform. We are keeping this short on purpose, we know you are juggling priorities.\n\n" + so,
           "{Greeting}\n\nOur team is following up in case a colleague is the better contact. A forward to the right person would be a big help if so.\n\n" + so,
           "{Greeting}\n\nA brief bump in case the first message missed you. The team remains available for a first call or a few questions by email, whichever is lighter.\n\n" + so,
           "{Greeting}\n\nOne more try from the team, then we will not crowd your inbox. If there is interest, we are ready to move quickly; if not, a quick decline is welcome.\n\n" + so,
           "{Greeting}\n\nChecking whether priorities shifted. If a partnership or a scoped project is on hold, we can align on a better month to reconnect instead.\n\n" + so,
-          "{Greeting}\n\nFrom the Tech Jump team: a concise follow-up. We can send a 3 bullet summary of our value prop if that is easier than a call on your end.\n\n" + so,
+          "{Greeting}\n\nFrom the outreach team: a concise follow-up. We can send a 3 bullet summary of our value prop if that is easier than a call on your end.\n\n" + so,
           "{Greeting}\n\nStill interested on our side, with no pressure. If you can point us to a better channel or a vendor process, we will follow it.\n\n" + so,
           "{Greeting}\n\nA quick note to stay on your radar. The team is flexible on time zones and we can do first touch by phone or video, as you like.\n\n" + so,
           "{Greeting}\n\nFollowing up with one question: is there a better time of week to reach you or a colleague who leads vendor conversations?\n\n" + so,
           "{Greeting}\n\nCircling back with a lighter ask: even a 5 minute call often saves both sides a long email chain. We can keep it to that if helpful.\n\n" + so,
           "{Greeting}\n\nOur team is still here if the earlier note was useful. If you are not the right person, a referral would still be appreciated.\n\n" + so,
           "{Greeting}\n\nA polite nudge. We are trying to avoid repeated pings, so a clear no or a better month to chat helps us back off or reschedule appropriately.\n\n" + so,
-          "{Greeting}\n\nTouching base once more from Tech Jump. We are happy to adjust our angle or the channel if there is a preference on your end.\n\n" + so,
+          "{Greeting}\n\nTouching base once more from Outreach Platform. We are happy to adjust our angle or the channel if there is a preference on your end.\n\n" + so,
           "{Greeting}\n\nShort and respectful follow-up. The team is ready when you are, and we are glad to work through your process if you have a standard one.\n\n" + so,
           "{Greeting}\n\nIn case the thread went cold, we are still one reply away. If the answer is a pass, a single line is enough and we will close our side cleanly.\n\n" + so,
           "{Greeting}\n\nFinal check-in for this sequence from the team, unless you tell us to try again later. We appreciate the read either way.\n\n" + so,
@@ -5743,7 +5743,7 @@
           '<div class="email-stage__delay-row">' +
           "<span><strong>Quick delay:</strong> wait</span>" +
           '<input type="number" class="email-stage-delay-min" min="0" max="10080" step="0.25" placeholder="" title="Minutes after previous email; leave blank to use calendar days + time above" />' +
-          "<span>min after previous email ‚Äî overrides day + clock when set (use <strong>0</strong> for ~45s after prior).</span>" +
+          "<span>min after previous email ó overrides day + clock when set (use <strong>0</strong> for ~45s after prior).</span>" +
           "</div>" +
           "<label for=\"st-body-" +
           stageNum +
@@ -5980,7 +5980,7 @@
         if (to) {
           hint.innerHTML = "Goes to <strong>" + escapeHtml(to) + "</strong>.";
         } else {
-          hint.innerHTML = "Enter their email, or open <strong>Optional</strong> below if you‚Äôre fixing a specific row.";
+          hint.innerHTML = "Enter their email, or open <strong>Optional</strong> below if youíre fixing a specific row.";
         }
       }
 
@@ -6024,7 +6024,7 @@
           if (list.length === 0) {
             clearAutoLinkPickers();
             if (hint) {
-              hint.innerHTML = "New contact ‚Äî we‚Äôll add them to Pipeline when you send.";
+              hint.innerHTML = "New contact ó weíll add them to Pipeline when you send.";
             }
             return;
           }
@@ -6061,12 +6061,12 @@
           syncDirectorFromTarget(list[0]);
           if (hint) {
             hint.innerHTML =
-              "<strong>" + String(list.length) + "</strong> rows share this email ‚Äî pick one.";
+              "<strong>" + String(list.length) + "</strong> rows share this email ó pick one.";
           }
         } catch (err) {
           clearAutoLinkPickers();
           if (hint) {
-            hint.textContent = "Couldn‚Äôt check Pipeline ‚Äî you can still send.";
+            hint.textContent = "Couldnít check Pipeline ó you can still send.";
           }
         }
       }
@@ -6193,7 +6193,7 @@
         var label = btn ? btn.textContent : "Send";
         if (btn) {
           btn.disabled = true;
-          btn.textContent = "Sending‚Ä¶";
+          btn.textContent = "SendingÖ";
         }
         out.className = "result";
         out.innerHTML = "";
@@ -6213,7 +6213,7 @@
           var toVal = built.toVal;
 
           if (await isDuplicateCampaignSend(payload)) {
-            if (!window.confirm("Duplicate campaign found ‚Äî are you sure you want to resend it?")) {
+            if (!window.confirm("Duplicate campaign found ó are you sure you want to resend it?")) {
               tjRunSendButtonRestore(btn, label);
               return;
             }
@@ -6298,8 +6298,8 @@
               if (x.body.deliveryMode === "sendgrid") {
                 el.innerHTML =
                   "Outbound mail is sent via <strong>SendGrid</strong> from <strong>" +
-                  escapeHtml(x.body.fromEmail || "autoemailer@tech-jump.com") +
-                  "</strong> ‚Äî not from your personal Gmail. Recipients should check their inbox (and Spam) for that sender.";
+                  escapeHtml(x.body.fromEmail || "noreply@example.com") +
+                  "</strong> ó not from your personal Gmail. Recipients should check their inbox (and Spam) for that sender.";
               } else {
                 el.innerHTML =
                   '<span class="warn-inline">SendGrid is not active on the server (dry-run). Emails will show as sent in the app but will <strong>not</strong> be delivered until SENDGRID_API_KEY is configured.</span>';
@@ -6404,10 +6404,10 @@
             };
             function shortCompanyLabel(comp) {
               if (!comp) return "";
-              return comp.length > 48 ? comp.slice(0, 45) + "‚Ä¶" : comp;
+              return comp.length > 48 ? comp.slice(0, 45) + "Ö" : comp;
             }
             function hasClosingLine(s) {
-              return /best regards|kind regards,|sincerely,|yours truly|the tech jump team|tech jump team|warmly,/i.test(
+              return /best regards|kind regards,|sincerely,|yours truly|the outreach team|outreach team|warmly,/i.test(
                 String(s || "")
               );
             }
@@ -6604,7 +6604,7 @@
         clearSendList();
       };
 
-      /** Text nodes don't have .closest ‚Äî used by delegated handlers */
+      /** Text nodes don't have .closest ó used by delegated handlers */
       function clickEventElement(ev) {
         var t = ev.target;
         if (!t) return null;

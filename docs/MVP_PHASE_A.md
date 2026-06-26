@@ -14,7 +14,7 @@
 
 ```bash
 cd "path/to/Deliverables"
-firebase use   # should be tech-jump-outreach (or your project)
+firebase use   # should be lead-automation-app (or your project)
 npm install --prefix functions
 firebase deploy --only functions
 firebase deploy --only hosting

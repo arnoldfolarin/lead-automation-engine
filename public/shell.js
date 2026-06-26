@@ -108,9 +108,9 @@
     aside.setAttribute("aria-label", "Main navigation");
 
     var brand =
-      '<a class="tj-sidebar__tile tj-sidebar__brand" href="/" title="Tech Jump home">' +
+      '<a class="tj-sidebar__tile tj-sidebar__brand" href="/" title="Outreach Platform home">' +
       '<div class="tj-sidebar__logo">TJ</div>' +
-      '<span class="tj-sidebar__label">Tech Jump</span>' +
+      '<span class="tj-sidebar__label">Outreach Platform</span>' +
       "</a>";
 
     var hamburger =

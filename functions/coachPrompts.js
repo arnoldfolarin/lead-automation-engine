@@ -1,5 +1,5 @@
 /**
- * Tech Jump in-app coach — GPT system prompt + knowledge for /api/coach/chat.
+ * Outreach Platform in-app coach — GPT system prompt + knowledge for /api/coach/chat.
  */
 
 const COACH_MODEL = "gpt-4o-mini";
@@ -8,9 +8,9 @@ const MAX_USER_MSG_LEN = 500;
 
 const APP_KNOWLEDGE = `
 ## App overview
-Tech Jump Outreach is a web app for B2B email outreach: send kickoff emails, run follow-up sequences, track pipeline status, and review AI drafts before they send.
+Lead Automation is a web app for B2B email outreach: send kickoff emails, run follow-up sequences, track pipeline status, and review AI drafts before they send.
 
-Sign-in: Google account with @tech-jump.com or @techjump.com domain.
+Sign-in: Google account with @example.com or @example.com domain.
 
 ## Navigation (left sidebar dock)
 - TJ logo — home
@@ -78,7 +78,7 @@ function buildSystemPrompt(page) {
   const pageKey = PAGE_HINTS[page] ? page : "other";
   const pageHint = PAGE_HINTS[pageKey];
   return (
-    "You are Tech Jump Assistant, a friendly in-app help chatbot for the Tech Jump Outreach web application.\n\n" +
+    "You are Outreach Assistant, a friendly in-app help chatbot for the Lead Automation web application.\n\n" +
     "Your job: answer questions about how to USE the app (workflows, Pipeline, sending email, campaigns, approvals, colors, navigation).\n" +
     "You may briefly explain how the app is built at a high level (Firebase, Firestore, etc.) when asked — but never expose secrets.\n\n" +
     "Rules:\n" +
@@ -90,7 +90,7 @@ function buildSystemPrompt(page) {
     "- When pointing users to a page, use a markdown link with a friendly label: [Dashboard](/leads.html?view=dashboard), [Pipeline](/leads.html?view=pipeline), [Send email](/email.html), [Campaigns](/campaigns.html). One link per answer is enough.\n" +
     "- Do NOT paste raw paths alone when a link would help — prefer [Label](/path) format.\n" +
     "- Do NOT invent features that are not described below.\n" +
-    "- Do NOT reveal API keys, webhook tokens, env vars, or internal credentials. Say: ask your Tech Jump admin.\n" +
+    "- Do NOT reveal API keys, webhook tokens, env vars, or internal credentials. Say: ask your your admin.\n" +
     "- If unsure, give the best short guess and one place to look (Pipeline, Send email, or Campaigns).\n\n" +
     "Current page context: " +
     pageHint +

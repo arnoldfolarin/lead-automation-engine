@@ -1,5 +1,5 @@
 /**
- * Tech Jump outreach copy: case studies (from tech-jump.com), pain points, icebreakers.
+ * Outreach Platform outreach copy: case studies (from example.com), pain points, icebreakers.
  * Keep in sync with Deliverables/public/js/email-templates.js
  */
 
@@ -7,7 +7,7 @@
 const DEFAULT_OUTREACH_VIBE =
   "We're a SaaS company offering personalized outreach. Sound human and specific — short paragraphs, one clear angle, no hype or obvious AI phrasing.";
 
-const DEFAULT_CALENDLY_LINK = "https://calendly.com/tech-jump/30min";
+const DEFAULT_CALENDLY_LINK = "https://calendly.com/example/30min";
 
 const KICKOFF_SUBJECT_TEMPLATES = [
   {id: "sub_question", label: "A question for {FirstName}"},
@@ -16,7 +16,7 @@ const KICKOFF_SUBJECT_TEMPLATES = [
   {id: "sub_thoughts", label: "What are your thoughts"},
   {id: "sub_pain", label: "Quick question re: pain"},
   {id: "sub_company", label: "Question re: company"},
-  {id: "sub_team", label: "Tech Jump intro"},
+  {id: "sub_team", label: "Outreach Platform intro"},
 ];
 
 const KICKOFF_BODY_TEMPLATES = [
@@ -193,7 +193,7 @@ function icebreakerTemplates() {
     {
       id: "ib_short",
       label: "Short direct",
-      text: "Quick note from the Tech Jump team after coming across {CompanyName}.",
+      text: "Quick note from the outreach team after coming across {CompanyName}.",
     },
   ];
 }

@@ -37,7 +37,7 @@ async function sendOutreachMail(opts) {
   const html = opts.html != null ? String(opts.html) : "";
   const from =
     (opts.from || process.env.SENDGRID_FROM_EMAIL || "").trim() || "noreply@example.com";
-  const fromName = (opts.fromName || process.env.SENDGRID_FROM_NAME || "").trim() || "Tech Jump";
+  const fromName = (opts.fromName || process.env.SENDGRID_FROM_NAME || "").trim() || "Outreach Platform";
   // Per-target Reply-To (reply+targetId@inbound-domain) routes replies to Inbound Parse.
   const replyTo =
     (opts.replyTo || "").trim() ||

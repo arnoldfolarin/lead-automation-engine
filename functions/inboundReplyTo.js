@@ -24,7 +24,7 @@ function buildTargetReplyTo(targetId) {
   // Optional override: route ALL replies to one mailbox (e.g. the Gmail inbox a
   // Zapier "New Email" trigger watches). This skips per-target plus-addressing, so
   // inbound matching falls back to the sender address (handled by findTargetForReply).
-  //   REPLY_TO_OVERRIDE_EMAIL=autoemailer@tech-jump.com   (explicit), or
+  //   REPLY_TO_OVERRIDE_EMAIL=noreply@example.com   (explicit), or
   //   REPLY_TO_USE_FROM_EMAIL=true                        (reuse SENDGRID_FROM_EMAIL)
   const override = String(process.env.REPLY_TO_OVERRIDE_EMAIL || "").trim();
   if (override) return override;

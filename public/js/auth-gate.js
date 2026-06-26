@@ -1,5 +1,5 @@
 /**
- * Firebase Auth (Google) + org domain gate for Tech Jump Hosting.
+ * Firebase Auth (Google) + org domain gate for Outreach Platform Hosting.
  * Requires: firebase-app-compat, firebase-auth-compat, /__/firebase/init.js before this script.
  *
  * - Waits for auth state to be ready before subscribing (avoids a bogus null → sign-in flash).
@@ -42,7 +42,7 @@
 
   var REASON_MESSAGES = {
     domain:
-      "Only Tech Jump team emails (@tech-jump.com or @techjump.com) can use this app.",
+      "Only outreach team emails (@example.com or @example.com) can use this app.",
     unverified:
       "Please verify your email address in your Google account, then sign in again.",
     timeout:
@@ -55,7 +55,7 @@
   function allowedDomain(email) {
     if (!email || typeof email !== "string") return false;
     const e = email.toLowerCase().trim();
-    return e.endsWith("@tech-jump.com") || e.endsWith("@techjump.com");
+    return e.endsWith("@example.com") || e.endsWith("@example.com");
   }
 
   /** Google OAuth users are treated as verified for client gate (Firebase sometimes lags emailVerified). */
@@ -222,7 +222,7 @@
           if (myEpoch !== authEpoch) return;
           onGuest({
             message:
-              "Only Tech Jump team emails (@tech-jump.com or @techjump.com) can use this app.",
+              "Only outreach team emails (@example.com or @example.com) can use this app.",
           });
           return;
         }

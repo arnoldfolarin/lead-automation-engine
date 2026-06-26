@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Leads dashboard — Tech Jump Lead Automation (Phase A)" />
-    <title>Tech Jump Lead Automation</title>
+    <meta name="description" content="Leads dashboard — Lead Automation Engine (Phase A)" />
+    <title>Lead Automation Engine</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -2636,9 +2636,9 @@
         </div>
       </div>
 
-      <footer class="simple-only">Tech Jump Lead Automation</footer>
+      <footer class="simple-only">Lead Automation Engine</footer>
       <footer class="tech-only">
-        API: <code>/api/targets</code>, <code>/api/leads?tenantId=…</code> · Project <code>tech-jump-outreach</code>
+        API: <code>/api/targets</code>, <code>/api/leads?tenantId=…</code> · Project <code>lead-automation-app</code>
       </footer>
     </div>
 
@@ -3120,8 +3120,8 @@
       try {
         document.title =
           document.documentElement.getAttribute("data-shell-view") === "pipeline"
-            ? "Pipeline — Tech Jump Lead Automation"
-            : "Dashboard — Tech Jump Lead Automation";
+            ? "Pipeline — Lead Automation Engine"
+            : "Dashboard — Lead Automation Engine";
       } catch (_) {}
 
       function isShellPipelineView() {
@@ -4283,7 +4283,7 @@
             ? '<span class="send-email-link muted">—</span>'
             : '<a class="send-email-link" href="' +
               escapeHtml(gmailThreadSearchUrl(em, subj)) +
-              '" target="_blank" rel="noopener" title="Search your Gmail — SendGrid sends usually do not appear here. Ask the recipient to check their inbox for mail from autoemailer@tech-jump.com.">Gmail search</a>';
+              '" target="_blank" rel="noopener" title="Search your Gmail — SendGrid sends usually do not appear here. Ask the recipient to check their inbox for mail from noreply@example.com.">Gmail search</a>';
         const campaign =
           T.lastCampaignName != null && String(T.lastCampaignName).trim()
             ? String(T.lastCampaignName).trim()

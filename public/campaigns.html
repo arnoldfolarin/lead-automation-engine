@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Campaigns — Tech Jump</title>
+    <title>Campaigns — Outreach Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -1245,10 +1245,10 @@
               </button>
             </div>
             <button type="button" class="btn-text" id="btnLukeTemplate">
-              Use Tech Jump outreach template
+              Use Outreach Platform outreach template
             </button>
             <label for="kickSubject">Subject line</label>
-            <input type="text" id="kickSubject" placeholder="e.g. Partnership opportunity — Tech Jump" />
+            <input type="text" id="kickSubject" placeholder="e.g. Partnership opportunity — Outreach Platform" />
             <label for="kickBody">Message</label>
             <textarea id="kickBody" placeholder="Your outreach email…"></textarea>
             <p class="muted" id="step2FooterHint">
@@ -1281,7 +1281,7 @@
               You're writing this yourself — same subject and message go to every checked recipient. Edit any row individually before sending.</p>
             <div id="leadList"></div>
             <label for="calendlyLink">Calendly link (appended in email)</label>
-            <input type="text" id="calendlyLink" value="https://calendly.com/tech-jump/30min" />
+            <input type="text" id="calendlyLink" value="https://calendly.com/example/30min" />
             <div class="ai-seq-box" style="margin-top: 1rem; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: rgba(59, 130, 246, 0.06)">
               <label style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; font-weight: 600">
                 <input type="checkbox" id="aiSequenceEnabled" checked style="margin-top: 0.2rem" />
@@ -1425,7 +1425,7 @@
         };
 
         var MANUAL_TEMPLATE =
-          "Hi [First name],\n\nI hope this finds you well. I'm reaching out on behalf of Tech Jump — we help businesses accelerate their growth through targeted lead generation and outreach automation.\n\nI'd love to explore whether there's an opportunity to support [Company] and would welcome a short call at your convenience.\n\nWould you be open to a 15–20 minute conversation this week or next?\n\nBest regards,\n[Your name]\nTech Jump\nhttps://calendly.com/tech-jump/30min";
+          "Hi [First name],\n\nI hope this finds you well. I'm reaching out on behalf of Outreach Platform — we help businesses accelerate their growth through targeted lead generation and outreach automation.\n\nI'd love to explore whether there's an opportunity to support [Company] and would welcome a short call at your convenience.\n\nWould you be open to a 15–20 minute conversation this week or next?\n\nBest regards,\n[Your name]\nOutreach Platform\nhttps://calendly.com/example/30min";
 
         function setWriteMode(mode) {
           state.writeMode = mode;
@@ -2792,7 +2792,7 @@
           if (!body) return;
           body.value = MANUAL_TEMPLATE;
           if (!document.getElementById("kickSubject").value.trim()) {
-            document.getElementById("kickSubject").value = "Partnership opportunity — Tech Jump";
+            document.getElementById("kickSubject").value = "Partnership opportunity — Outreach Platform";
           }
           setWriteMode("manual");
         });
@@ -2817,7 +2817,7 @@
             }
           } else {
             if (!state.kickSubject) {
-              state.kickSubject = "Intro — Tech Jump";
+              state.kickSubject = "Intro — Outreach Platform";
               document.getElementById("kickSubject").value = state.kickSubject;
             }
             if (!state.kickBody) {
@@ -3016,7 +3016,7 @@
                 to: L.email,
                 subject: L.suggestedSubject,
                 text: L.suggestedBody,
-                calendlyLink: calendly || "https://calendly.com/tech-jump/30min",
+                calendlyLink: calendly || "https://calendly.com/example/30min",
                 aiSequence: aiOn,
               };
               if (aiOn) payload.aiSequenceSendMode = aiMode;

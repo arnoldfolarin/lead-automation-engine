@@ -2695,7 +2695,7 @@ function attachApiRoutes(app, ctx) {
           {
             role: "system",
             content:
-              "You write short, credible B2B opener lines for Tech Jump outreach (pipeline/outbound support). One sentence. No hype.",
+              "You write short, credible B2B opener lines for Outreach Platform outreach (pipeline/outbound support). One sentence. No hype.",
           },
           {role: "user", content: prompt},
         ],

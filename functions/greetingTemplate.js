@@ -162,7 +162,7 @@ function defaultIceBreakerFallback(firstName, companyName) {
   if (companyName) {
     return "I came across " + companyName + " and wanted to connect.";
   }
-  return "I wanted to reach out and introduce the Tech Jump team.";
+  return "I wanted to reach out and introduce the outreach team.";
 }
 
 /**
@@ -272,7 +272,7 @@ function polishFilledOutreachText(text) {
   s = s.replace(/^Hoping to connect with\s*$/gm, "Hoping to connect");
   s = s.replace(/^What are your thoughts,\s*$/gm, "What are your thoughts?");
   s = s.replace(/^A question regarding\s*$/gm, "A quick question");
-  s = s.replace(/^Quick intro —\s*$/gm, "Quick intro from Tech Jump");
+  s = s.replace(/^Quick intro —\s*$/gm, "Quick intro from Outreach Platform");
   s = s.replace(/If we could help\s+with\b/gi, "If we could help your team with");
   s = s.replace(/\n{3,}/g, "\n\n");
   return s.trim();
@@ -348,7 +348,7 @@ function buildOutreachContext(target, opts) {
     CompanyName: companyName,
     City: city,
     CampaignName: campaignName,
-    SenderName: senderName || "Tech Jump team",
+    SenderName: senderName || "outreach team",
     SenderTitle: senderTitle,
     IceBreaker: iceBreaker,
     email,

@@ -1,6 +1,6 @@
 /**
 
- * Tech Jump Assistant — bottom-right GPT help chat (via /api/coach/chat).
+ * Outreach Assistant — bottom-right GPT help chat (via /api/coach/chat).
 
  * Requires sign-in (TJFetch + Firebase Auth). UI loads on all shell pages.
 
@@ -202,9 +202,9 @@
 
     var btn = el("button", "tj-coach-btn", "");
 
-    btn.setAttribute("aria-label", "Open Tech Jump Assistant");
+    btn.setAttribute("aria-label", "Open Outreach Assistant");
 
-    btn.setAttribute("title", "Tech Jump Assistant");
+    btn.setAttribute("title", "Outreach Assistant");
 
     btn.innerHTML =
 
@@ -238,7 +238,7 @@
 
     panel.setAttribute("role", "dialog");
 
-    panel.setAttribute("aria-label", "Tech Jump Assistant");
+    panel.setAttribute("aria-label", "Outreach Assistant");
 
     panel.hidden = true;
 
@@ -246,7 +246,7 @@
 
     var header = el("div", "tj-coach-header");
 
-    var title = el("div", "tj-coach-title", "Tech Jump Assistant");
+    var title = el("div", "tj-coach-title", "Outreach Assistant");
 
     var closeBtn = el("button", "tj-coach-close", "×");
 
@@ -344,9 +344,9 @@
 
       pipeline: "Checking your pipeline? Ask about colors, replies, or approvals.",
 
-      dashboard: "Hi — ask me anything about Tech Jump Outreach.",
+      dashboard: "Hi — ask me anything about Lead Automation.",
 
-      other: "Hi — I can help you use Tech Jump. Ask me anything.",
+      other: "Hi — I can help you use Outreach Platform. Ask me anything.",
 
     };
 
@@ -441,7 +441,7 @@
 
         return {
 
-          error: "Sign in to use the assistant. Open the app and sign in with your Tech Jump Google account.",
+          error: "Sign in to use the assistant. Open the app and sign in with your Outreach Platform Google account.",
 
         };
 

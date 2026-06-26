@@ -35,7 +35,7 @@ function systemPromptForTouch(touchNumber) {
   const n = Number(touchNumber) || 2;
   if (n <= 2) {
     return (
-      "You write concise B2B follow-up emails for Tech Jump. This is touch 2 — a polite bump after the initial outreach. " +
+      "You write concise B2B follow-up emails for Outreach Platform. This is touch 2 — a polite bump after the initial outreach. " +
       "Reference the prior thread abstractly (do not invent specifics). Stay professional and short. " +
       "Reply with valid JSON only, no markdown fences, keys: subject (max 120 chars), body_plain (plain text, 2-4 short paragraphs, no markdown). " +
       "Do NOT include a sign-off, closing, or signature — the email system adds that automatically at send time."
@@ -43,13 +43,13 @@ function systemPromptForTouch(touchNumber) {
   }
   if (n === 3) {
     return (
-      "You write concise B2B follow-up emails for Tech Jump. This is touch 3 — add light value or a fresh angle; avoid repeating touch 2 verbatim. " +
+      "You write concise B2B follow-up emails for Outreach Platform. This is touch 3 — add light value or a fresh angle; avoid repeating touch 2 verbatim. " +
       "Reply with valid JSON only, keys: subject (max 120 chars), body_plain (plain text, 2-4 short paragraphs, no markdown). " +
       "Do NOT include a sign-off, closing, or signature — the email system adds that automatically at send time."
     );
   }
   return (
-    "You write concise B2B follow-up emails for Tech Jump. This is a later touch — keep it very brief; you may use a respectful 'last note' tone without being pushy. " +
+    "You write concise B2B follow-up emails for Outreach Platform. This is a later touch — keep it very brief; you may use a respectful 'last note' tone without being pushy. " +
     "Reply with valid JSON only, keys: subject (max 120 chars), body_plain (plain text, 2-3 short paragraphs, no markdown). " +
     "Do NOT include a sign-off, closing, or signature — the email system adds that automatically at send time."
   );
@@ -105,7 +105,7 @@ function buildUserPayload(targetData, touchNumber) {
     linkedinConversationNotesPlaceholder: linkedinStub,
     emailEngagementHint: engagementHint,
     instructions:
-      "Write the next outbound email continuing Tech Jump's outreach. Use outboundThreadFromApp as the source of truth for prior emails sent through this system. Do not fabricate meetings or replies. No URLs unless essential; Calendly and signature are added in the HTML wrapper separately. Do not include sign-off or signature in body_plain.",
+      "Write the next outbound email continuing Outreach Platform's outreach. Use outboundThreadFromApp as the source of truth for prior emails sent through this system. Do not fabricate meetings or replies. No URLs unless essential; Calendly and signature are added in the HTML wrapper separately. Do not include sign-off or signature in body_plain.",
   });
 }
 
@@ -180,7 +180,7 @@ async function draftInboundAiReply(client, targetData, inbound) {
     (d.name != null ? String(d.name) : "") ||
     "Unknown company";
   const system =
-    "You write short, professional B2B email replies for Tech Jump and also classify the inbound message. " +
+    "You write short, professional B2B email replies for Outreach Platform and also classify the inbound message. " +
     "Return valid JSON only with keys: subject (string, max 120 chars), body_plain (string, 2-4 short paragraphs), " +
     "confidence (number 0..1), risk_flags (array of short strings), sentiment (\"positive\" | \"neutral\" | \"negative\"), " +
     "intent (one of: interested, booking, ask_info, out_of_office, wrong_person, not_interested, unsubscribe, negative, other). " +
@@ -292,7 +292,7 @@ async function draftKickoffEmail(client, opts) {
     campaignName: campaignName || "outreach",
     variant,
     instructions:
-      "Write a kickoff cold email for Tech Jump using proven B2B template structure plus userBrief for angle. " +
+      "Write a kickoff cold email for Outreach Platform using proven B2B template structure plus userBrief for angle. " +
       "Mirror paragraph flow from bodyTemplateSkeleton/bodyTemplateRef: opener, value or pain, proof or ask, CTA — rewrite in natural language per userBrief. " +
       "userBrief overrides generic tone; templates are structure only. Weave iceBreaker when it fits. " +
       lengthInstruction(emailLength) +
@@ -305,7 +305,7 @@ async function draftKickoffEmail(client, opts) {
       {
         role: "system",
         content:
-          "You write credible B2B kickoff outreach emails for Tech Jump. Sound human, specific, and low-noise — never generic AI filler. " +
+          "You write credible B2B kickoff outreach emails for Outreach Platform. Sound human, specific, and low-noise — never generic AI filler. " +
           "Follow userBrief for tone, angle, personalization hooks, and length. Use template skeletons and filled refs as scaffolding only. " +
           "Format body_plain professionally: {Greeting} on its own first line, blank lines between paragraphs, indented bullets when used. " +
           "Reply with valid JSON only, keys: subject (max 120 chars), body_plain (plain text). " +
@@ -391,7 +391,7 @@ async function suggestOutreachSetup(client, catalog, opts) {
       {
         role: "system",
         content:
-          "You configure B2B cold email outreach for Tech Jump. Pick template ids from the catalog only. When existingVibeHint is a detailed user brief, templates must support that angle. Reply with valid JSON only.",
+          "You configure B2B cold email outreach for Outreach Platform. Pick template ids from the catalog only. When existingVibeHint is a detailed user brief, templates must support that angle. Reply with valid JSON only.",
       },
       {role: "user", content: userPayload},
     ],

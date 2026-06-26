@@ -18,7 +18,7 @@
     }
   ],
   "hosting": {
-    "site": "tech-jump-outreach",
+    "site": "lead-automation-app",
     "public": "public",
     "ignore": [
       "firebase.json",

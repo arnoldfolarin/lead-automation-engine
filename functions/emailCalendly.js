@@ -1,6 +1,6 @@
 /**
 
- * Plain + HTML email bodies with Tech Jump signature and optional Calendly link.
+ * Plain + HTML email bodies with Outreach Platform signature and optional Calendly link.
 
  */
 
@@ -16,7 +16,7 @@ const TJ_SIGNATURE_LOGO_URL =
 
   process.env.EMAIL_SIGNATURE_LOGO_URL ||
 
-  "https://tech-jump-outreach.web.app/assets/tech-jump-logo.png";
+  "https://your-app.web.app/assets/app-logo.png";
 
 
 
@@ -178,13 +178,13 @@ function stripTrailingSignOff(bodyPlain) {
 
   }
 
-  if (/the tech jump team/i.test(s.slice(-120))) {
+  if (/the outreach team/i.test(s.slice(-120))) {
 
     s = s
 
-      .replace(/\n*best regards,?\n*the tech jump team\s*$/i, "")
+      .replace(/\n*best regards,?\n*the outreach team\s*$/i, "")
 
-      .replace(/\n*the tech jump team\s*$/i, "")
+      .replace(/\n*the outreach team\s*$/i, "")
 
       .replace(/\s+$/u, "");
 
@@ -232,7 +232,7 @@ function resolveSenderFields(opts) {
 
   if (!name) {
 
-    name = "Tech Jump team";
+    name = "outreach team";
 
   }
 
@@ -388,7 +388,7 @@ function buildOutlookSignature(opts, calendlyUrl) {
 
     escapeHtml(TJ_SIGNATURE_LOGO_URL) +
 
-    '" alt="Tech Jump" width="56" style="display:block;border:0;max-width:56px;height:auto">' +
+    '" alt="Outreach Platform" width="56" style="display:block;border:0;max-width:56px;height:auto">' +
 
     "</p>" +
 
@@ -404,7 +404,7 @@ function buildOutlookSignature(opts, calendlyUrl) {
 
 /**
 
- * Build text + HTML with stripped body, one Tech Jump signature, optional Calendly link inline.
+ * Build text + HTML with stripped body, one Outreach Platform signature, optional Calendly link inline.
 
  *
 

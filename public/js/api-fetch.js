@@ -1,5 +1,5 @@
 /**
- * Authenticated fetch for /api/* — attaches Firebase ID token (Tech Jump Hosting).
+ * Authenticated fetch for /api/* — attaches Firebase ID token (Outreach Platform Hosting).
  * Requires: firebase compat + currentUser (call only after sign-in).
  */
 (function () {

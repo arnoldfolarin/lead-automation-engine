@@ -5,7 +5,7 @@
   var NEUTRAL_GREETINGS = ["Hey there,", "Hello,", "Hi,", "Good day,"];
   var DEFAULT_OUTREACH_VIBE =
     "We're a SaaS company offering personalized outreach. Sound human and specific — short paragraphs, one clear angle, no hype or obvious AI phrasing.";
-  var DEFAULT_CALENDLY_LINK = "https://calendly.com/tech-jump/30min";
+  var DEFAULT_CALENDLY_LINK = "https://calendly.com/example/30min";
   var GENERIC_EMAIL_DOMAINS = {
     gmail: 1,
     googlemail: 1,
@@ -101,7 +101,7 @@
     {id: "ib_bottleneck", label: "Outreach bottleneck (generic)", text: "Teams like {CompanyName} often hit the same outreach bottlenecks we help fix."},
     {id: "ib_case", label: "Case study mention", text: "We recently supported {CaseStudy}; your space reminded me of that work."},
     {id: "ib_role", label: "Growth / revenue angle", text: "Saw you may be leading growth or revenue motion at {CompanyName} and wanted to connect."},
-    {id: "ib_short", label: "Short direct", text: "Quick note from the Tech Jump team after coming across {CompanyName}."},
+    {id: "ib_short", label: "Short direct", text: "Quick note from the outreach team after coming across {CompanyName}."},
   ];
 
   function pickIcebreakerTemplate(seed) {
@@ -152,7 +152,7 @@
   function defaultIceBreakerFallback(firstName, companyName) {
     if (firstName && companyName) return "I wanted to reach out to " + firstName + " at " + companyName + ".";
     if (companyName) return "I came across " + companyName + " and wanted to connect.";
-    return "I wanted to reach out and introduce the Tech Jump team.";
+    return "I wanted to reach out and introduce the outreach team.";
   }
 
   function deriveCompanyLabelFromEmail(emailRaw) {
@@ -246,7 +246,7 @@
     s = s.replace(/^Hoping to connect with\s*$/gm, "Hoping to connect");
     s = s.replace(/^What are your thoughts,\s*$/gm, "What are your thoughts?");
     s = s.replace(/^A question regarding\s*$/gm, "A quick question");
-    s = s.replace(/^Quick intro —\s*$/gm, "Quick intro from Tech Jump");
+    s = s.replace(/^Quick intro —\s*$/gm, "Quick intro from Outreach Platform");
     s = s.replace(/If we could help\s+with\b/gi, "If we could help your team with");
     s = s.replace(/\n{3,}/g, "\n\n");
     return s.trim();
@@ -329,7 +329,7 @@
       CompanyName: companyName,
       City: city,
       CampaignName: campaignName,
-      SenderName: senderName || "Tech Jump team",
+      SenderName: senderName || "outreach team",
       SenderTitle: senderTitle,
       IceBreaker: iceBreaker,
       email: email,
@@ -363,7 +363,7 @@
     {id: "sub_thoughts", label: "What are your thoughts", text: "What are your thoughts, {FirstName}"},
     {id: "sub_pain", label: "Quick question re: pain", text: "Quick question about {PainPoint}"},
     {id: "sub_company", label: "Question re: company", text: "A question regarding {CompanyName}"},
-    {id: "sub_team", label: "Tech Jump intro", text: "Introduction from the Tech Jump team"},
+    {id: "sub_team", label: "Outreach Platform intro", text: "Introduction from the outreach team"},
   ];
 
   var KICKOFF_BODIES = [
