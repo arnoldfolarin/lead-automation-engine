@@ -11,7 +11,9 @@ The implementation is rather naive and I am sure it can be significiantly improv
 
 ## Video
 
-https://github.com/arnoldfolarin/lead-automation-engine/raw/refs/heads/gh-attach-assets/eb6c34d3-14aa-4c60-bae4-7da0b3443fa1/demo-walkthrough.mp4
+![Lead automation demo walkthrough](docs/assets/demo-walkthrough.gif)
+
+Full recording (MP4): https://github.com/arnoldfolarin/lead-automation-engine/releases/download/demo-walkthrough/demo-walkthrough.mp4
 
 ## Motivation
 
