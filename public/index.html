@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tech Jump — Lead Automation</title>
+    <!-- Main app lives on leads.html (Pipeline); auth gate sends guests to login only when needed. -->
+    <script>
+      (function () {
+        var p = (location.pathname || "/").replace(/\/+$/, "") || "/";
+        if (p === "/" || p === "/index.html") {
+          location.replace("/leads.html?view=dashboard");
+        }
+      })();
+    </script>
+  </head>
+  <body
+    style="font-family: system-ui, sans-serif; margin: 2rem; color: #0f172a; background: #f1f5f9"
+  >
+    <p>Opening app… <a href="/leads.html?view=dashboard">Continue</a></p>
+  </body>
+</html>

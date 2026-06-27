@@ -1,0 +1,37 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "targets",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "sequenceStatus", "order": "ASCENDING"},
+        {"fieldPath": "nextSequenceSendAt", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "inboundReplyPending",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "notifyUid", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "uid", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "uid", "order": "ASCENDING"},
+        {"fieldPath": "read", "order": "ASCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
