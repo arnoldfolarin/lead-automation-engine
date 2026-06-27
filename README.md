@@ -1,6 +1,6 @@
 # Lead Automation Engine
 
-> AI-powered B2B outreach automation — internship project at TechJump (built with Cursor).
+> AI-powered B2B outreach automation engine I made for my internship project at TechJump (built with AI-assisted development tools like Cursor and Opus 4.8).
 
 AI-powered lead automation platform: ingest leads, generate personalized outreach with OpenAI, deliver email through SendGrid, track replies, and run scheduled follow-up sequences. All lead events are logged in Firestore under tenant-scoped paths.
 
