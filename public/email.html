@@ -1480,6 +1480,19 @@
         font-size: 0.84rem;
         margin: 0;
       }
+      .email-stage-preview {
+        margin: 0.65rem 0 0;
+      }
+      .email-stage-preview.email-resolved-preview {
+        margin: 0.65rem 0 0.35rem;
+        padding: 0.65rem 0.75rem;
+      }
+      .email-resolved-preview__body.is-empty-hint {
+        color: var(--muted);
+        font-style: italic;
+        background: transparent;
+        padding: 0;
+      }
       .btn-add-stage {
         font: inherit;
         font-size: 0.78rem;
@@ -5072,7 +5085,13 @@
         }
         if (subPrev) subPrev.textContent = resolvedSub.trim() || "—";
         if (bodyPrev) {
-          bodyPrev.textContent = resolvedBody.trim() || "—";
+          if (!rawBody.trim() && rawSub.trim()) {
+            bodyPrev.textContent = "Message body is empty — add text above or use AI generate.";
+            bodyPrev.classList.add("is-empty-hint");
+          } else {
+            bodyPrev.textContent = resolvedBody.trim() || "—";
+            bodyPrev.classList.remove("is-empty-hint");
+          }
         }
         var unresolved = findUnresolvedTokens(resolvedSub).concat(findUnresolvedTokens(resolvedBody));
         var unique = [];
@@ -5131,6 +5150,7 @@
           }).catch(function () {});
         } catch (_) {}
         // #endregion
+        updateAllFollowupStagePreviews();
       }
 
       function maybeAutoFillFromPipeline(it) {
@@ -5755,14 +5775,61 @@
           "</div>" +
           "<textarea class=\"st-body\" id=\"st-body-" +
           stageNum +
-          "\">" +
-          String(b)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;") +
-          "</textarea>" +
+          "\"></textarea>" +
+          '<div class="email-stage-preview email-resolved-preview" aria-live="polite">' +
+          '<div class="email-resolved-preview__head">' +
+          "<strong>Preview for current recipient</strong>" +
+          '<span class="email-resolved-preview__for email-stage-preview__for">Add a To address or pick from Pipeline</span>' +
+          "</div>" +
+          '<p class="email-stage-preview__warn email-resolved-preview__warn" hidden></p>' +
+          '<pre class="email-stage-preview__body email-resolved-preview__body">—</pre>' +
+          "</div>" +
           '<p class="email-bench-hint" style="font-size:0.72rem;margin:0.35rem 0 0">AI rewrites the greeting when you set a name above; otherwise a neutral opener is used.</p>';
+        var ta = w.querySelector("textarea.st-body");
+        if (ta) ta.value = b;
+        updateFollowupStagePreview(w);
         return w;
+      }
+
+      function updateFollowupStagePreview(stageEl) {
+        if (!stageEl) return;
+        var ta = stageEl.querySelector("textarea.st-body");
+        var bodyPrev = stageEl.querySelector(".email-stage-preview__body");
+        var warnEl = stageEl.querySelector(".email-stage-preview__warn");
+        var forEl = stageEl.querySelector(".email-stage-preview__for");
+        if (!ta || !bodyPrev) return;
+        var target = buildComposeTargetFromItem();
+        var opts = getComposeFillOpts();
+        var rawBody = String(ta.value || "");
+        var resolvedBody = fillOutreachTemplateClient(rawBody, target, opts);
+        ta.setAttribute("data-token-preview", resolvedBody);
+        var recipientLabel = opts.email || opts.companyName || "";
+        if (forEl) {
+          forEl.textContent = recipientLabel
+            ? "For: " + recipientLabel
+            : "Add a To address or pick from Pipeline";
+        }
+        bodyPrev.textContent = resolvedBody.trim() || "—";
+        bodyPrev.classList.remove("is-empty-hint");
+        if (warnEl) {
+          var unresolved = findUnresolvedTokens(resolvedBody);
+          if (unresolved.length) {
+            warnEl.hidden = false;
+            warnEl.textContent = "Still unresolved: " + unresolved.join(", ");
+          } else {
+            warnEl.hidden = true;
+            warnEl.textContent = "";
+          }
+        }
+      }
+
+      function updateAllFollowupStagePreviews() {
+        var wrap = document.getElementById("emailStagesWrap");
+        if (!wrap) return;
+        var stages = wrap.querySelectorAll(".email-stage");
+        for (var i = 0; i < stages.length; i++) {
+          updateFollowupStagePreview(stages[i]);
+        }
       }
 
       function initEmailFollowupStages() {
@@ -5771,6 +5838,7 @@
         w.innerHTML = "";
         w.appendChild(makeEmailStageEl(1));
         w.appendChild(makeEmailStageEl(2));
+        updateAllFollowupStagePreviews();
       }
 
       function collectEmailFollowupStages() {
@@ -5925,11 +5993,21 @@
               return;
             }
             var n = wrap.querySelectorAll(".email-stage").length + 1;
-            wrap.appendChild(makeEmailStageEl(n));
+            var newStage = makeEmailStageEl(n);
+            wrap.appendChild(newStage);
+            updateFollowupStagePreview(newStage);
           });
         }
         var wFollowStages = document.getElementById("emailStagesWrap");
         if (wFollowStages) {
+          wFollowStages.addEventListener("input", function (ev) {
+            var t = ev.target;
+            if (!t || t.nodeType !== 1) return;
+            if (t.matches && t.matches("textarea.st-body")) {
+              var blockIn = t.closest(".email-stage");
+              if (blockIn) updateFollowupStagePreview(blockIn);
+            }
+          });
           wFollowStages.addEventListener("click", function (ev) {
             var t = ev.target;
             if (!t) return;
@@ -5946,6 +6024,7 @@
             if (!fpool || !fpool.length) return;
             taF.value = fpool[__aiFollowupRot % fpool.length];
             __aiFollowupRot++;
+            updateFollowupStagePreview(block);
           });
         }
         document.addEventListener("keydown", function (ev) {

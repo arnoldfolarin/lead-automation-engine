@@ -33,6 +33,17 @@
           "region": "us-central1"
         }
       }
+    ],
+    "headers": [
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, max-age=0"
+          }
+        ]
+      }
     ]
   }
 }

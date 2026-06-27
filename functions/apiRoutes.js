@@ -26,6 +26,7 @@ const {
 const {draftInboundAiReply, draftKickoffEmail, suggestOutreachSetup} = require("./sequencePrompts");
 const {kickoffTouchSnapshot, maxFollowupStagesFromTarget, followupTouchSnapshot} = require("./touchSnapshot");
 const {chatWithCoach} = require("./coachPrompts");
+const {parseContactsPayload} = require("./parseContacts");
 
 const FieldValue = admin.firestore.FieldValue;
 
@@ -621,6 +622,123 @@ function attachApiRoutes(app, ctx) {
     }
   });
 
+  app.get("/api/outreach-folders", async (req, res) => {
+    const user = await requireUser(req, res);
+    if (!user) {
+      return;
+    }
+    const tenantId = req.query.tenantId != null ? String(req.query.tenantId).trim() : "";
+    if (!tenantId) {
+      return res.status(400).json({error: "tenantId is required"});
+    }
+    try {
+      const snap = await db
+          .collection("tenants")
+          .doc(tenantId)
+          .collection("outreachFolders")
+          .orderBy("createdAt", "asc")
+          .limit(100)
+          .get();
+      const folders = snap.docs.map((d) => Object.assign({id: d.id}, deepSerialize(d.data() || {})));
+      return res.json({folders, count: folders.length});
+    } catch (e) {
+      logger.error("outreach_folders_list_failed", {err: e && e.message ? e.message : e});
+      return res.status(500).json({error: "Failed to list outreach folders"});
+    }
+  });
+
+  app.post("/api/outreach-folders", async (req, res) => {
+    const user = await requireUser(req, res);
+    if (!user) {
+      return;
+    }
+    const b = req.body && typeof req.body === "object" ? req.body : {};
+    const tenantId = b.tenantId != null ? String(b.tenantId).trim() : "";
+    const name = b.name != null ? String(b.name).trim().slice(0, 120) : "";
+    if (!tenantId) {
+      return res.status(400).json({error: "tenantId is required"});
+    }
+    if (!name) {
+      return res.status(400).json({error: "name is required"});
+    }
+    try {
+      const ref = await db.collection("tenants").doc(tenantId).collection("outreachFolders").add({
+        name,
+        authorUid: user.uid,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+      return res.status(201).json({id: ref.id, ok: true, name});
+    } catch (e) {
+      logger.error("outreach_folders_create_failed", {err: e && e.message ? e.message : e});
+      return res.status(500).json({error: "Failed to create folder"});
+    }
+  });
+
+  app.patch("/api/outreach-folders/:folderId", async (req, res) => {
+    const user = await requireUser(req, res);
+    if (!user) {
+      return;
+    }
+    const folderId = (req.params.folderId || "").trim();
+    const b = req.body && typeof req.body === "object" ? req.body : {};
+    const tenantId = b.tenantId != null ? String(b.tenantId).trim() : "";
+    const name = b.name != null ? String(b.name).trim().slice(0, 120) : "";
+    if (!tenantId || !folderId) {
+      return res.status(400).json({error: "tenantId and folderId are required"});
+    }
+    if (!name) {
+      return res.status(400).json({error: "name is required"});
+    }
+    try {
+      const ref = db.collection("tenants").doc(tenantId).collection("outreachFolders").doc(folderId);
+      const cur = await ref.get();
+      if (!cur.exists) {
+        return res.status(404).json({error: "Folder not found"});
+      }
+      await ref.update({name, updatedAt: FieldValue.serverTimestamp()});
+      return res.json({ok: true, id: folderId, name});
+    } catch (e) {
+      logger.error("outreach_folders_patch_failed", {err: e && e.message ? e.message : e});
+      return res.status(500).json({error: "Failed to rename folder"});
+    }
+  });
+
+  app.delete("/api/outreach-folders/:folderId", async (req, res) => {
+    const user = await requireUser(req, res);
+    if (!user) {
+      return;
+    }
+    const folderId = (req.params.folderId || "").trim();
+    const tenantId = req.query.tenantId != null ? String(req.query.tenantId).trim() : "";
+    if (!tenantId || !folderId) {
+      return res.status(400).json({error: "tenantId and folderId are required"});
+    }
+    try {
+      const ref = db.collection("tenants").doc(tenantId).collection("outreachFolders").doc(folderId);
+      const cur = await ref.get();
+      if (!cur.exists) {
+        return res.status(404).json({error: "Folder not found"});
+      }
+      const targetsSnap = await db
+          .collection("tenants")
+          .doc(tenantId)
+          .collection("targets")
+          .where("outreachFolderId", "==", folderId)
+          .limit(500)
+          .get();
+      const batch = db.batch();
+      batch.delete(ref);
+      targetsSnap.docs.forEach((d) => {
+        batch.update(d.ref, {outreachFolderId: FieldValue.delete()});
+      });
+      await batch.commit();
+      return res.json({ok: true, clearedTargets: targetsSnap.size});
+    } catch (e) {
+      logger.error("outreach_folders_delete_failed", {err: e && e.message ? e.message : e});
+      return res.status(500).json({error: "Failed to delete folder"});
+    }
+  });
+
   app.get("/api/leads", async (req, res) => {
     const user = await requireUser(req, res);
     if (!user) {
@@ -703,11 +821,21 @@ function attachApiRoutes(app, ctx) {
       "outreachVibe",
       "pipelineStatus",
       "lastReplyAt",
+      "outreachFolderId",
     ];
     const update = {};
     for (const k of allowed) {
       if (Object.prototype.hasOwnProperty.call(patch, k)) {
-        update[k] = patch[k];
+        if (k === "outreachFolderId") {
+          const v = patch[k];
+          if (v == null || String(v).trim() === "") {
+            update[k] = FieldValue.delete();
+          } else {
+            update[k] = String(v).trim().slice(0, 120);
+          }
+        } else {
+          update[k] = patch[k];
+        }
       }
     }
     if (update.email && !update.contactEmail) {
@@ -727,6 +855,62 @@ function attachApiRoutes(app, ctx) {
     } catch (e) {
       logger.error("target_patch_failed", {err: e && e.message ? e.message : e});
       return res.status(500).json({error: "Patch failed"});
+    }
+  });
+
+  app.post("/api/targets/bulk-folder", async (req, res) => {
+    const user = await requireUser(req, res);
+    if (!user) {
+      return;
+    }
+    const b = req.body && typeof req.body === "object" ? req.body : {};
+    const tenantId = b.tenantId != null ? String(b.tenantId).trim() : "";
+    const targetIds = Array.isArray(b.targetIds) ? b.targetIds : [];
+    if (!tenantId) {
+      return res.status(400).json({error: "tenantId is required"});
+    }
+    if (!targetIds.length) {
+      return res.status(400).json({error: "targetIds array is required"});
+    }
+    const folderIdRaw = b.outreachFolderId;
+    const folderId =
+      folderIdRaw == null || String(folderIdRaw).trim() === "" ? null : String(folderIdRaw).trim().slice(0, 120);
+    if (folderId) {
+      const folderRef = db.collection("tenants").doc(tenantId).collection("outreachFolders").doc(folderId);
+      const folderSnap = await folderRef.get();
+      if (!folderSnap.exists) {
+        return res.status(404).json({error: "Folder not found"});
+      }
+    }
+    const ids = targetIds
+        .map((id) => String(id || "").trim())
+        .filter(Boolean)
+        .slice(0, 100);
+    if (!ids.length) {
+      return res.status(400).json({error: "No valid targetIds"});
+    }
+    try {
+      const batch = db.batch();
+      let updated = 0;
+      for (const targetId of ids) {
+        const ref = db.collection("tenants").doc(tenantId).collection("targets").doc(targetId);
+        const cur = await ref.get();
+        if (!cur.exists) continue;
+        if (folderId) {
+          batch.update(ref, {outreachFolderId: folderId});
+        } else {
+          batch.update(ref, {outreachFolderId: FieldValue.delete()});
+        }
+        updated++;
+      }
+      if (updated === 0) {
+        return res.status(404).json({error: "No matching targets found"});
+      }
+      await batch.commit();
+      return res.json({ok: true, updated, outreachFolderId: folderId});
+    } catch (e) {
+      logger.error("targets_bulk_folder_failed", {err: e && e.message ? e.message : e});
+      return res.status(500).json({error: "Bulk folder assign failed"});
     }
   });
 
@@ -1747,6 +1931,33 @@ function attachApiRoutes(app, ctx) {
     } catch (e) {
       logger.error("ai_sequence_discard_failed", {err: e && e.message ? e.message : e});
       return res.status(500).json({error: "Discard failed"});
+    }
+  });
+
+  app.post("/api/ai/parse-contacts", async (req, res) => {
+    const user = await requireUser(req, res);
+    if (!user) {
+      return;
+    }
+    const b = req.body || {};
+    const kind = String(b.kind || "csv").trim().toLowerCase();
+    if (kind === "excel" && !b.base64) {
+      return res.status(400).json({error: "Excel import requires base64 file data"});
+    }
+    if ((kind === "csv" || kind === "text") && !String(b.text || "").trim()) {
+      return res.status(400).json({error: "CSV or text import requires file content"});
+    }
+    try {
+      const result = parseContactsPayload({
+        kind,
+        text: b.text,
+        base64: b.base64,
+        fileName: b.fileName,
+      });
+      return res.json(result);
+    } catch (e) {
+      logger.error("parse_contacts_failed", {err: e && e.message ? e.message : e});
+      return res.status(400).json({error: "Could not parse file — use Apollo CSV or .xlsx export"});
     }
   });
 

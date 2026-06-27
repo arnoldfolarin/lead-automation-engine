@@ -1318,7 +1318,7 @@
         <div class="modal-body">
           <p class="muted" style="margin-top: 0">What would you like to do?</p>
           <div class="start-pick">
-            <button type="button" class="primary" id="btnPickImport">Import contacts with AI</button>
+            <button type="button" class="primary" id="btnPickImport">Import contacts</button>
             <button type="button" id="btnPickWizard">Step-by-step campaign</button>
           </div>
         </div>
@@ -1334,11 +1334,10 @@
         <div class="modal-body">
           <p class="err-text" id="importErr" hidden></p>
           <div class="import-field">
-            <label>File type</label>
+            <label>Source</label>
             <div class="import-options">
-              <label><input type="radio" name="importKind" value="csv" checked /> CSV (Apollo)</label>
-              <label><input type="radio" name="importKind" value="excel" /> Excel (.xlsx)</label>
-              <label><input type="radio" name="importKind" value="text" /> Paste / .txt</label>
+              <label><input type="radio" name="importKind" value="spreadsheet" checked /> Spreadsheet (Apollo CSV or Excel)</label>
+              <label><input type="radio" name="importKind" value="text" /> Paste text</label>
             </div>
           </div>
           <div class="import-field">
@@ -1366,7 +1365,7 @@
             <textarea id="importPaste" rows="5" placeholder="Paste export text, a column dump, or one contact per line…"></textarea>
           </div>
           <div class="btn-row">
-            <button type="button" class="btn btn-solid" id="btnRunParse">Parse with AI</button>
+            <button type="button" class="btn btn-solid" id="btnRunParse">Preview import</button>
           </div>
           <div id="importLoading" class="tj-mascot-scene" hidden>
             <div class="tj-mascot-row">
@@ -1389,7 +1388,7 @@
               </table>
             </div>
             <div class="btn-row" style="margin-top: 0.75rem">
-              <button type="button" class="btn btn-solid" id="btnConfirmImport">Import now</button>
+              <button type="button" class="btn btn-solid" id="btnConfirmImport" disabled>Import now</button>
             </div>
           </div>
         </div>
@@ -1506,7 +1505,23 @@
         var startBackdrop = document.getElementById("start-modal-backdrop");
         var importBackdrop = document.getElementById("import-modal-backdrop");
         var __importParse = null;
+        var __importFile = null;
 
+        function getImportFile() {
+          if (__importFile) return __importFile;
+          var fileInput = document.getElementById("importFile");
+          return fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+        }
+        function updateImportConfirmState() {
+          var btn = document.getElementById("btnConfirmImport");
+          if (!btn) return;
+          var n = __importParse && __importParse.contacts ? __importParse.contacts.length : 0;
+          btn.disabled = n < 1;
+        }
+        function stashImportFile(file) {
+          __importFile = file || null;
+          __importParse = null;
+        }
         function setImportErr(msg) {
           var el = document.getElementById("importErr");
           if (!el) return;
@@ -1514,15 +1529,42 @@
           el.hidden = !msg;
         }
 
-        function syncImportKindUi() {
+        function getImportUiKind() {
           var kindR = document.querySelectorAll('input[name="importKind"]');
-          var kind = "csv";
           for (var i = 0; i < kindR.length; i++) {
-            if (kindR[i].checked) {
-              kind = kindR[i].value;
-              break;
-            }
+            if (kindR[i].checked) return kindR[i].value;
           }
+          return "spreadsheet";
+        }
+
+        function detectImportParseKind(file, uiKind) {
+          var note = "";
+          if (!file) {
+            return uiKind === "text" ? {kind: "text", note: ""} : null;
+          }
+          var name = String(file.name || "").toLowerCase();
+          var mime = String(file.type || "").toLowerCase();
+          var isExcel =
+            name.endsWith(".xlsx") ||
+            mime.indexOf("spreadsheetml.sheet") >= 0 ||
+            mime.indexOf("spreadsheetml") >= 0;
+          if (isExcel) {
+            return {kind: "excel", note: "Detected Excel file — parsing as .xlsx"};
+          }
+          if (name.endsWith(".csv")) {
+            return {kind: "csv", note: note};
+          }
+          if (name.endsWith(".txt")) {
+            return {kind: "text", note: "Detected .txt — parsing as text"};
+          }
+          if (uiKind === "spreadsheet") {
+            return {kind: "csv", note: "Unknown extension — trying as CSV"};
+          }
+          return {kind: "text", note: ""};
+        }
+
+        function syncImportKindUi() {
+          var kind = getImportUiKind();
           var fileRow = document.getElementById("importFileRow");
           var pasteRow = document.getElementById("importPasteRow");
           var fileInput = document.getElementById("importFile");
@@ -1530,21 +1572,17 @@
           if (kind === "text") {
             fileRow.hidden = false;
             pasteRow.hidden = false;
-            fileInput.accept = ".txt,text/plain";
-          } else if (kind === "excel") {
-            fileRow.hidden = false;
-            pasteRow.hidden = true;
-            fileInput.accept =
-              ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            fileInput.accept = ".csv,.txt,text/csv,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
           } else {
             fileRow.hidden = false;
             pasteRow.hidden = true;
-            fileInput.accept = ".csv,text/csv";
+            fileInput.accept = ".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
           }
         }
 
         function resetImportModal() {
           __importParse = null;
+          __importFile = null;
           setImportErr("");
           var loading = document.getElementById("importLoading");
           if (loading) loading.hidden = true;
@@ -1564,11 +1602,12 @@
           var dt = document.getElementById("importDropText");
           if (dz) { dz.classList.remove("has-file", "drag-over"); }
           if (dt) dt.innerHTML = 'Drop file here or <u>click to browse</u>';
-          var rc = document.querySelector('input[name="importKind"][value="csv"]');
+          var rc = document.querySelector('input[name="importKind"][value="spreadsheet"]');
           var ri = document.querySelector('input[name="importDest"][value="inbound"]');
           if (rc) rc.checked = true;
           if (ri) ri.checked = true;
           syncImportKindUi();
+          updateImportConfirmState();
         }
 
         function openStartModal() {
@@ -1639,34 +1678,35 @@
               "</td>";
             tbody.appendChild(tr);
           }
+          if (!list.length) {
+            setImportErr(
+              "Could not read emails — if this is an Excel file, hard-refresh the page (Ctrl+Shift+R) and drop again."
+            );
+          } else {
+            setImportErr("");
+          }
+          updateImportConfirmState();
         }
 
         function runImportParse() {
           setImportErr("");
-          var kindR = document.querySelectorAll('input[name="importKind"]');
-          var kind = "csv";
-          for (var i = 0; i < kindR.length; i++) {
-            if (kindR[i].checked) {
-              kind = kindR[i].value;
-              break;
-            }
-          }
+          var uiKind = getImportUiKind();
           var pasteEl = document.getElementById("importPaste");
           var paste = pasteEl ? pasteEl.value.trim() : "";
-          var fileInput = document.getElementById("importFile");
-          var file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+          var file = getImportFile();
           var loading = document.getElementById("importLoading");
           var resBlock = document.getElementById("importResultBlock");
           if (loading) loading.hidden = false;
           if (resBlock) resBlock.hidden = true;
           __importParse = null;
+          var detected = detectImportParseKind(file, uiKind);
 
           function finishErr(msg) {
             if (loading) loading.hidden = true;
             setImportErr(msg);
           }
 
-          function doRequest(payload) {
+          function doRequest(payload, detectNote) {
             TJFetch("/api/ai/parse-contacts", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -1684,9 +1724,11 @@
                   return;
                 }
                 var b = x.body;
+                var parseNote = b.parseNote || "";
+                if (detectNote) parseNote = detectNote + (parseNote ? " · " + parseNote : "");
                 __importParse = {
                   contacts: b.contacts || [],
-                  parseNote: b.parseNote || "",
+                  parseNote: parseNote,
                   fileName: b.fileName || (file ? file.name : "paste"),
                 };
                 renderImportPreview({
@@ -1696,6 +1738,7 @@
                   count: b.count,
                 });
                 if (resBlock) resBlock.hidden = false;
+                updateImportConfirmState();
               })
               .catch(function (e) {
                 finishErr(e.message || String(e));
@@ -1704,11 +1747,23 @@
 
           var tenant = getTenant();
 
+          if (uiKind === "text" && !file && !paste) {
+            finishErr("Paste contact text or choose a file.");
+            return;
+          }
+          if (uiKind === "spreadsheet" && !file) {
+            finishErr("Choose an Apollo CSV or Excel (.xlsx) file.");
+            return;
+          }
+          if (!detected && uiKind === "spreadsheet") {
+            finishErr("Choose an Apollo CSV or Excel (.xlsx) file.");
+            return;
+          }
+
+          var kind = detected ? detected.kind : "text";
+          var detectNote = detected && detected.note ? detected.note : "";
+
           if (kind === "excel") {
-            if (!file) {
-              finishErr("Choose an Excel (.xlsx) file.");
-              return;
-            }
             var r = new FileReader();
             r.onload = function () {
               doRequest({
@@ -1716,7 +1771,7 @@
                 kind: "excel",
                 fileName: file.name || "sheet.xlsx",
                 base64: r.result,
-              });
+              }, detectNote);
             };
             r.onerror = function () {
               finishErr("Could not read file.");
@@ -1726,10 +1781,6 @@
           }
 
           if (kind === "csv") {
-            if (!file) {
-              finishErr("Upload an Apollo CSV, or choose Paste / .txt.");
-              return;
-            }
             var r2 = new FileReader();
             r2.onload = function () {
               var t = r2.result;
@@ -1742,7 +1793,7 @@
                 kind: "csv",
                 fileName: file.name || "export.csv",
                 text: t,
-              });
+              }, detectNote);
             };
             r2.onerror = function () {
               finishErr("Could not read file.");
@@ -1756,7 +1807,7 @@
               finishErr("Paste text or upload a .txt file.");
               return;
             }
-            doRequest({ tenantId: tenant, kind: "text", fileName: name, text: text });
+            doRequest({ tenantId: tenant, kind: "text", fileName: name, text: text }, detectNote);
           }
 
           if (file) {
@@ -1777,7 +1828,7 @@
 
         function confirmImportNow() {
           if (!__importParse || !__importParse.contacts || !__importParse.contacts.length) {
-            setImportErr("Parse contacts first — nothing to import.");
+            setImportErr("Preview import first — nothing to import.");
             return;
           }
           setImportErr("");
@@ -2750,7 +2801,11 @@
           }
 
           fileInput.addEventListener("change", function () {
-            if (fileInput.files && fileInput.files[0]) setFileName(fileInput.files[0].name);
+            if (fileInput.files && fileInput.files[0]) {
+              stashImportFile(fileInput.files[0]);
+              setFileName(fileInput.files[0].name);
+              requestAnimationFrame(function () { runImportParse(); });
+            }
           });
 
           zone.addEventListener("dragenter", function (e) {
@@ -2772,7 +2827,9 @@
             var dt = new DataTransfer();
             dt.items.add(files[0]);
             fileInput.files = dt.files;
+            stashImportFile(files[0]);
             setFileName(files[0].name);
+            requestAnimationFrame(function () { runImportParse(); });
           });
         })();
         document.getElementById("btnCloseModal").addEventListener("click", closeModal);

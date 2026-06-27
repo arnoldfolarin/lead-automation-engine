@@ -189,6 +189,105 @@
         font-size: 0.72rem;
         color: var(--muted);
       }
+      .outreach-folder-nav {
+        margin: 0 0 0.65rem;
+        padding: 0.55rem 0.65rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(59, 130, 246, 0.05);
+      }
+      .outreach-folder-nav__inner {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .outreach-folder-section {
+        margin-top: 0.15rem;
+      }
+      .outreach-folder-section__head {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin: 0.25rem 0 0.15rem;
+      }
+      .outreach-folder-section__head button {
+        font: inherit;
+        color: inherit;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+      .outreach-folder-section__body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        padding-left: 0.35rem;
+      }
+      .outreach-folder-item {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        width: 100%;
+        text-align: left;
+        font: inherit;
+        font-size: 0.82rem;
+        padding: 0.35rem 0.5rem;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+      }
+      .outreach-folder-item:hover {
+        background: rgba(59, 130, 246, 0.12);
+      }
+      .outreach-folder-item.is-selected {
+        background: rgba(59, 130, 246, 0.2);
+        border-color: rgba(59, 130, 246, 0.45);
+      }
+      .outreach-folder-item__count {
+        margin-left: auto;
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+      .outreach-folder-item__rename {
+        font-size: 0.72rem;
+        padding: 0.1rem 0.35rem;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .outreach-folder-item__rename:hover {
+        color: var(--text);
+        border-color: var(--accent);
+      }
+      .outreach-folder-add {
+        font: inherit;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--accent);
+        background: transparent;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+        text-align: left;
+      }
+      .outreach-bulk-toolbar .outreach-folder-move-select {
+        max-width: 11rem;
+        font-size: 0.78rem;
+        margin: 0;
+      }
+      .outreach-bulk-toolbar .btn-outreach-bulk-folder {
+        font-size: 0.78rem;
+      }
       .sheet-grid .col-inbound-chk,
       .sheet-grid .col-outreach-chk {
         width: 2rem;
@@ -2533,6 +2632,7 @@
             <div id="targets-inbound-replies"></div>
             <div id="targets-ai-drafts"></div>
             <div id="targets-summary"></div>
+            <div id="outreach-folder-nav" class="outreach-folder-nav" hidden aria-label="Outreach folders"></div>
             <div id="targets-wrap"></div>
             <details class="sheet-help tech-only">
               <summary>Firestore path &amp; fields</summary>
@@ -2652,11 +2752,10 @@
           <p class="leads-import-err" id="leadsImportErr" hidden></p>
 
           <div class="limport-field">
-            <label class="limport-label">File type</label>
+            <label class="limport-label">Source</label>
             <div class="limport-options">
-              <label><input type="radio" name="leadsImportKind" value="csv" checked /> CSV (Apollo)</label>
-              <label><input type="radio" name="leadsImportKind" value="excel" /> Excel (.xlsx)</label>
-              <label><input type="radio" name="leadsImportKind" value="text" /> Paste / .txt</label>
+              <label><input type="radio" name="leadsImportKind" value="spreadsheet" checked /> Spreadsheet (Apollo CSV or Excel)</label>
+              <label><input type="radio" name="leadsImportKind" value="text" /> Paste text</label>
             </div>
           </div>
 
@@ -2687,7 +2786,7 @@
           </div>
 
           <div class="limport-btn-row">
-            <button type="button" class="btn btn-solid" id="btnLeadsRunParse">Parse with AI</button>
+            <button type="button" class="btn btn-solid" id="btnLeadsRunParse">Preview import</button>
           </div>
 
           <div id="leadsImportLoading" class="tj-mascot-scene" hidden>
@@ -2712,7 +2811,7 @@
               </table>
             </div>
             <div class="limport-btn-row" style="margin-top:0.75rem">
-              <button type="button" class="btn btn-solid" id="btnLeadsConfirmImport">Import now</button>
+              <button type="button" class="btn btn-solid" id="btnLeadsConfirmImport" disabled>Import now</button>
             </div>
           </div>
         </div>
@@ -3158,6 +3257,7 @@
       const tableWrap = document.getElementById("table-wrap");
       const targetsSummaryEl = document.getElementById("targets-summary");
       const targetsWrap = document.getElementById("targets-wrap");
+      const outreachFolderNavEl = document.getElementById("outreach-folder-nav");
       const toggleViewBtn = document.getElementById("toggleView");
       const lastUpdatedLine = document.getElementById("lastUpdatedLine");
       const lastUpdatedTime = document.getElementById("lastUpdatedTime");
@@ -4218,9 +4318,229 @@
       }
 
       /** scope: "" (active / main column) or "pending" (awaiting first send, inbound column) */
+      window.__outreachFoldersList = window.__outreachFoldersList || [];
+      window.__outreachFolderFilter = window.__outreachFolderFilter || {type: "all"};
+      const OUTREACH_FOLDER_OPEN_KEY = "tj_outreach_folder_open";
+
+      function targetCampaignLabel(T) {
+        if (T.lastCampaignName != null && String(T.lastCampaignName).trim()) {
+          return String(T.lastCampaignName).trim();
+        }
+        if (T.campaignName != null && String(T.campaignName).trim()) {
+          return String(T.campaignName).trim();
+        }
+        return "Uncategorized";
+      }
+
+      function targetHasCustomFolder(T) {
+        return !!(T && T.outreachFolderId != null && String(T.outreachFolderId).trim());
+      }
+
+      function countActiveForOutreachFilter(activeTargets, filter) {
+        return filterActiveOutreachTargets(activeTargets || [], filter).length;
+      }
+
+      function filterActiveOutreachTargets(activeTargets, filter) {
+        const list = activeTargets || [];
+        const f = filter || {type: "all"};
+        if (f.type === "all") return list.slice();
+        if (f.type === "custom" && f.folderId) {
+          return list.filter(function (T) {
+            return String(T.outreachFolderId || "") === String(f.folderId);
+          });
+        }
+        if (f.type === "campaign") {
+          const key = f.key != null ? String(f.key) : "";
+          return list.filter(function (T) {
+            if (targetHasCustomFolder(T)) return false;
+            return targetCampaignLabel(T) === key;
+          });
+        }
+        return list.slice();
+      }
+
+      function buildCampaignGroups(activeTargets) {
+        const map = {};
+        (activeTargets || []).forEach(function (T) {
+          if (targetHasCustomFolder(T)) return;
+          const label = targetCampaignLabel(T);
+          map[label] = (map[label] || 0) + 1;
+        });
+        return Object.keys(map)
+          .sort(function (a, b) {
+            return a.localeCompare(b);
+          })
+          .map(function (key) {
+            return {key: key, count: map[key]};
+          });
+      }
+
+      function isOutreachFolderSectionOpen(sectionId) {
+        try {
+          const raw = localStorage.getItem(OUTREACH_FOLDER_OPEN_KEY);
+          const parsed = raw ? JSON.parse(raw) : {};
+          return parsed[sectionId] !== false;
+        } catch (_) {
+          return true;
+        }
+      }
+
+      function setOutreachFolderSectionOpen(sectionId, open) {
+        try {
+          const raw = localStorage.getItem(OUTREACH_FOLDER_OPEN_KEY);
+          const parsed = raw ? JSON.parse(raw) : {};
+          parsed[sectionId] = !!open;
+          localStorage.setItem(OUTREACH_FOLDER_OPEN_KEY, JSON.stringify(parsed));
+        } catch (_) {}
+      }
+
+      async function loadOutreachFolders(tenantId) {
+        const tid = (tenantId || "default").toString().trim().toLowerCase() || "default";
+        try {
+          const res = await TJFetch(
+            "/api/outreach-folders?tenantId=" + encodeURIComponent(tid) + "&_=" + Date.now(),
+            {cache: "no-store"}
+          );
+          if (!res.ok) {
+            window.__outreachFoldersList = [];
+            return [];
+          }
+          const body = await res.json();
+          window.__outreachFoldersList = (body && body.folders) || [];
+          return window.__outreachFoldersList;
+        } catch (_) {
+          window.__outreachFoldersList = [];
+          return [];
+        }
+      }
+
+      function outreachFolderMoveSelectHtml(folders) {
+        let html =
+          '<select class="outreach-folder-move-select" id="outreachFolderMoveSelect" aria-label="Move selected to folder">' +
+          '<option value="">Move to folder…</option>' +
+          '<option value="__clear__">Remove from folder</option>';
+        (folders || []).forEach(function (f) {
+          if (!f || !f.id) return;
+          html +=
+            '<option value="' +
+            escapeHtml(String(f.id)) +
+            '">' +
+            escapeHtml(String(f.name || "Folder")) +
+            "</option>";
+        });
+        html += "</select>";
+        return html;
+      }
+
+      function renderOutreachFolderNav(activeTargets, tenantId) {
+        if (!outreachFolderNavEl) return;
+        const active = activeTargets || [];
+        if (!active.length) {
+          outreachFolderNavEl.hidden = true;
+          outreachFolderNavEl.innerHTML = "";
+          return;
+        }
+        outreachFolderNavEl.hidden = false;
+        const filter = window.__outreachFolderFilter || {type: "all"};
+        const folders = window.__outreachFoldersList || [];
+        const campaigns = buildCampaignGroups(active);
+        const campaignsOpen = isOutreachFolderSectionOpen("campaigns");
+        const customOpen = isOutreachFolderSectionOpen("custom");
+        let html = '<div class="outreach-folder-nav__inner">';
+        const allSel = filter.type === "all" ? " is-selected" : "";
+        html +=
+          '<button type="button" class="outreach-folder-item' +
+          allSel +
+          '" data-filter-type="all">' +
+          "<span>All outreach</span>" +
+          '<span class="outreach-folder-item__count">' +
+          active.length +
+          "</span></button>";
+
+        html += '<div class="outreach-folder-section">';
+        html +=
+          '<div class="outreach-folder-section__head"><button type="button" class="outreach-folder-section-toggle" data-section="campaigns" aria-expanded="' +
+          (campaignsOpen ? "true" : "false") +
+          '">' +
+          (campaignsOpen ? "▼" : "▶") +
+          " Campaigns</button></div>";
+        if (campaignsOpen) {
+          html += '<div class="outreach-folder-section__body">';
+          if (!campaigns.length) {
+            html += '<span class="muted" style="font-size:0.78rem;padding:0.2rem 0.5rem">No campaign groups yet</span>';
+          }
+          campaigns.forEach(function (g) {
+            const sel = filter.type === "campaign" && filter.key === g.key ? " is-selected" : "";
+            html +=
+              '<button type="button" class="outreach-folder-item' +
+              sel +
+              '" data-filter-type="campaign" data-filter-key="' +
+              escapeHtml(g.key) +
+              '"><span>' +
+              escapeHtml(g.key) +
+              '</span><span class="outreach-folder-item__count">' +
+              g.count +
+              "</span></button>";
+          });
+          html += "</div>";
+        }
+        html += "</div>";
+
+        html += '<div class="outreach-folder-section">';
+        html +=
+          '<div class="outreach-folder-section__head"><button type="button" class="outreach-folder-section-toggle" data-section="custom" aria-expanded="' +
+          (customOpen ? "true" : "false") +
+          '">' +
+          (customOpen ? "▼" : "▶") +
+          " Custom folders</button></div>";
+        if (customOpen) {
+          html += '<div class="outreach-folder-section__body">';
+          folders.forEach(function (f) {
+            if (!f || !f.id) return;
+            const cnt = active.filter(function (T) {
+              return String(T.outreachFolderId || "") === String(f.id);
+            }).length;
+            const sel = filter.type === "custom" && filter.folderId === f.id ? " is-selected" : "";
+            html +=
+              '<div class="outreach-folder-item-row" style="display:flex;align-items:center;gap:0.25rem">' +
+              '<button type="button" class="outreach-folder-item' +
+              sel +
+              '" style="flex:1" data-filter-type="custom" data-filter-id="' +
+              escapeHtml(String(f.id)) +
+              '"><span>' +
+              escapeHtml(String(f.name || "Folder")) +
+              '</span><span class="outreach-folder-item__count">' +
+              cnt +
+              "</span></button>" +
+              '<button type="button" class="outreach-folder-item__rename" data-folder-rename="' +
+              escapeHtml(String(f.id)) +
+              '" title="Rename folder">✎</button>' +
+              "</div>";
+          });
+          html +=
+            '<button type="button" class="outreach-folder-add" data-folder-create="1">+ New folder</button>';
+          html += "</div>";
+        }
+        html += "</div></div>";
+        outreachFolderNavEl.innerHTML = html;
+      }
+
+      function refreshOutreachActiveGrid() {
+        const targets = window.__pipelineTargetsList || [];
+        const split = partitionOutreachTargets(targets);
+        const active = split.active;
+        const filtered = filterActiveOutreachTargets(active, window.__outreachFolderFilter);
+        const tid = normalizeTenantInput(document.getElementById("tenantId").value);
+        targetsWrap.innerHTML = outreachDetailHtml(outreachSheetHtml(filtered, false, false, tid));
+        renderOutreachFolderNav(active, tid);
+        pipelineOutreachCheckboxAnchor = null;
+        updateOutreachToolbarState();
+        refreshOpenOutboundEmailLogIfVisible();
+      }
+
       function outreachBulkToolbarHtml(scope) {
         const sfx = scope === "pending" ? "-pending" : "";
-        return (
+        let html =
           '<div class="inbound-toolbar outreach-bulk-toolbar" id="outreachBulkToolbar' +
           sfx +
           '">' +
@@ -4232,12 +4552,20 @@
           '" disabled>Send email</button>' +
           '<button type="button" class="btn-inbound-delete btn-outreach-bulk-delete" id="btnOutreachBulkDelete' +
           sfx +
-          '" disabled>Remove selected</button>' +
+          '" disabled>Remove selected</button>';
+        if (scope !== "pending") {
+          html +=
+            outreachFolderMoveSelectHtml(window.__outreachFoldersList || []) +
+            '<button type="button" class="btn-inbound-send btn-outreach-bulk-folder" id="btnOutreachBulkFolder' +
+            sfx +
+            '" disabled>Move to folder</button>';
+        }
+        html +=
           '<span class="inbound-toolbar-note outreach-toolbar-note" id="outreachToolbarNote' +
           sfx +
           '"></span>' +
-          "</div>"
-        );
+          "</div>";
+        return html;
       }
 
       function targetRowHtml(T, rowNum, isDemo, sheetTenantId) {
@@ -4506,6 +4834,10 @@
         updateOutreachToolbarState();
         window.__pipelineTargetsList = DEMO_TARGETS.slice();
         dashMetricOutreach = 1;
+        if (outreachFolderNavEl) {
+          outreachFolderNavEl.innerHTML = "";
+          outreachFolderNavEl.hidden = true;
+        }
       }
 
       function renderOutreachEmptyAuthed(tenantId) {
@@ -4519,6 +4851,10 @@
             '<p class="summary">No companies in outreach yet. Use <strong>Add company</strong> or <strong>Import</strong> (or send from Send email / Campaigns), then <strong>Refresh</strong>.</p>';
         }
         targetsWrap.innerHTML = "";
+        if (outreachFolderNavEl) {
+          outreachFolderNavEl.innerHTML = "";
+          outreachFolderNavEl.hidden = true;
+        }
         const pendingEmpty = document.getElementById("pipeline-pending-outreach-wrap");
         if (pendingEmpty) {
           pendingEmpty.innerHTML = "";
@@ -4576,6 +4912,10 @@
           '<p class="summary" style="color:var(--muted)">Loading outreach…</p>';
         targetsWrap.innerHTML = "";
         window.__pipelineTargetsList = [];
+        if (outreachFolderNavEl) {
+          outreachFolderNavEl.innerHTML = "";
+          outreachFolderNavEl.hidden = true;
+        }
         const pendingClear = document.getElementById("pipeline-pending-outreach-wrap");
         if (pendingClear) {
           pendingClear.innerHTML = "";
@@ -4624,6 +4964,7 @@
         dashMetricOutreach = typeof body.count === "number" ? body.count : targets.length;
 
         await Promise.all([loadPendingAiDrafts(tid), loadPendingInboundReplies(tid, {silentPoll: false})]);
+        await loadOutreachFolders(tid);
         maybeOpenInboundPendingFromUrl(tid, inboundPendingCache);
 
         if (targets.length === 0) {
@@ -4641,6 +4982,7 @@
           const split = partitionOutreachTargets(targets);
           const pending = split.pending;
           const active = split.active;
+          const filteredActive = filterActiveOutreachTargets(active, window.__outreachFolderFilter);
           window.__pendingOutreachCount = pending.length;
           updatePipelineLiveHint();
 
@@ -4680,16 +5022,25 @@
               pending.length +
               "</strong> outreach contact(s) await their <strong>first send</strong>. Expand the <strong>Inbound</strong> column for the full list, bulk email, and bulk remove. After you send, they appear in this outreach grid.</p>";
           } else {
+            const shown = filteredActive.length;
+            const filterNote =
+              window.__outreachFolderFilter && window.__outreachFolderFilter.type !== "all"
+                ? " (filtered view — " + shown + " shown)"
+                : "";
             targetsSummaryEl.innerHTML =
               '<p class="summary"><strong>' +
-              pc +
+              shown +
               "</strong> compan" +
-              (pc === 1 ? "y" : "ies") +
-              " in outreach</p>";
+              (shown === 1 ? "y" : "ies") +
+              " in outreach" +
+              filterNote +
+              (active.length !== shown ? " · <strong>" + active.length + "</strong> total with send logged" : "") +
+              "</p>";
           }
 
+          renderOutreachFolderNav(active, tid);
           targetsWrap.innerHTML = outreachDetailHtml(
-            outreachSheetHtml(active, false, false, tid),
+            outreachSheetHtml(filteredActive, false, false, tid),
           );
           pipelineOutreachCheckboxAnchor = null;
           updateOutreachToolbarState();
@@ -5833,6 +6184,7 @@
         document.querySelectorAll(".outreach-bulk-scope").forEach(function (scopeRoot) {
           const btn = scopeRoot.querySelector(".btn-outreach-bulk-send");
           const btnDel = scopeRoot.querySelector(".btn-outreach-bulk-delete");
+          const btnFolder = scopeRoot.querySelector(".btn-outreach-bulk-folder");
           const note = scopeRoot.querySelector(".outreach-toolbar-note");
           const selAll = scopeRoot.querySelector(".outreach-select-all");
           if (!btn) return;
@@ -5844,6 +6196,10 @@
           if (btnDel) {
             btnDel.disabled = n === 0;
             btnDel.textContent = n ? "Remove selected (" + n + ")" : "Remove selected";
+          }
+          if (btnFolder) {
+            btnFolder.disabled = n === 0;
+            btnFolder.textContent = n ? "Move to folder (" + n + ")" : "Move to folder";
           }
           if (note) {
             note.textContent =
@@ -6079,6 +6435,95 @@
       if (targetsWrapEl) targetsWrapEl.addEventListener("change", onOutreachBulkChange);
       if (pipelinePendingWrapEl) pipelinePendingWrapEl.addEventListener("change", onOutreachBulkChange);
 
+      if (outreachFolderNavEl) {
+        outreachFolderNavEl.addEventListener("click", async function (e) {
+          const t = e.target;
+          if (!t || !t.closest) return;
+          const sectionToggle = t.closest(".outreach-folder-section-toggle");
+          if (sectionToggle) {
+            const sectionId = sectionToggle.getAttribute("data-section");
+            if (!sectionId) return;
+            const open = isOutreachFolderSectionOpen(sectionId);
+            setOutreachFolderSectionOpen(sectionId, !open);
+            const active = partitionOutreachTargets(window.__pipelineTargetsList || []).active;
+            renderOutreachFolderNav(active, normalizeTenantInput(document.getElementById("tenantId").value));
+            return;
+          }
+          const renameBtn = t.closest("[data-folder-rename]");
+          if (renameBtn) {
+            const folderId = renameBtn.getAttribute("data-folder-rename");
+            const folders = window.__outreachFoldersList || [];
+            let curName = "Folder";
+            folders.forEach(function (f) {
+              if (f && String(f.id) === String(folderId)) curName = String(f.name || "Folder");
+            });
+            const next = window.prompt("Rename folder", curName);
+            if (next == null) return;
+            const name = String(next).trim();
+            if (!name) return;
+            const tenant = normalizeTenantInput(document.getElementById("tenantId").value);
+            try {
+              const res = await TJFetch("/api/outreach-folders/" + encodeURIComponent(folderId), {
+                method: "PATCH",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({tenantId: tenant, name: name}),
+              });
+              const body = await res.json().catch(function () {
+                return {};
+              });
+              if (!res.ok) throw new Error(body.error || "Rename failed");
+              await loadOutreachFolders(tenant);
+              refreshOutreachActiveGrid();
+            } catch (err) {
+              alert(err && err.message ? err.message : String(err));
+            }
+            return;
+          }
+          const createBtn = t.closest("[data-folder-create]");
+          if (createBtn) {
+            const name = window.prompt("New folder name");
+            if (name == null) return;
+            const trimmed = String(name).trim();
+            if (!trimmed) return;
+            const tenant = normalizeTenantInput(document.getElementById("tenantId").value);
+            try {
+              const res = await TJFetch("/api/outreach-folders", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({tenantId: tenant, name: trimmed}),
+              });
+              const body = await res.json().catch(function () {
+                return {};
+              });
+              if (!res.ok) throw new Error(body.error || "Create failed");
+              await loadOutreachFolders(tenant);
+              refreshOutreachActiveGrid();
+            } catch (err) {
+              alert(err && err.message ? err.message : String(err));
+            }
+            return;
+          }
+          const filterBtn = t.closest(".outreach-folder-item[data-filter-type]");
+          if (filterBtn) {
+            const fType = filterBtn.getAttribute("data-filter-type") || "all";
+            if (fType === "all") {
+              window.__outreachFolderFilter = {type: "all"};
+            } else if (fType === "campaign") {
+              window.__outreachFolderFilter = {
+                type: "campaign",
+                key: filterBtn.getAttribute("data-filter-key") || "",
+              };
+            } else if (fType === "custom") {
+              window.__outreachFolderFilter = {
+                type: "custom",
+                folderId: filterBtn.getAttribute("data-filter-id") || "",
+              };
+            }
+            refreshOutreachActiveGrid();
+          }
+        });
+      }
+
       function bindOutreachBulkClick(rootEl) {
         if (!rootEl) return;
         rootEl.addEventListener("click", async function (e) {
@@ -6109,6 +6554,51 @@
             return;
           }
           window.location.href = "/email.html?tenantId=" + encodeURIComponent(tenant);
+          return;
+        }
+
+        const btnBulkFolder = e.target.closest(".btn-outreach-bulk-folder");
+        if (btnBulkFolder) {
+          if (btnBulkFolder.disabled) return;
+          const scopeRootFolder = btnBulkFolder.closest(".outreach-bulk-scope");
+          if (!scopeRootFolder) return;
+          const tenantFolder = normalizeTenantInput(document.getElementById("tenantId").value);
+          const selEl = scopeRootFolder.querySelector(".outreach-folder-move-select");
+          const folderVal = selEl ? String(selEl.value || "").trim() : "";
+          if (!folderVal) {
+            alert("Choose a folder from the dropdown first.");
+            return;
+          }
+          const targetIds = [];
+          scopeRootFolder.querySelectorAll(".pipeline-target-chk:checked").forEach(function (cb) {
+            const id = (cb.getAttribute("data-target-id") || "").trim();
+            if (id) targetIds.push(id);
+          });
+          if (!targetIds.length) return;
+          const outreachFolderId = folderVal === "__clear__" ? null : folderVal;
+          btnBulkFolder.disabled = true;
+          try {
+            const res = await TJFetch("/api/targets/bulk-folder", {
+              method: "POST",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({
+                tenantId: tenantFolder,
+                targetIds: targetIds,
+                outreachFolderId: outreachFolderId,
+              }),
+            });
+            const body = await res.json().catch(function () {
+              return {};
+            });
+            if (!res.ok) {
+              throw new Error(body.error || "Move failed: " + res.status);
+            }
+            await loadTargets();
+          } catch (err) {
+            alert(err && err.message ? err.message : String(err));
+          } finally {
+            btnBulkFolder.disabled = false;
+          }
           return;
         }
 
@@ -6930,6 +7420,7 @@
     <script>
     (function () {
       var __liParse = null;
+      var __liImportFile = null;
       var __liDefaultDest = "outreach";
 
       function liGetTenant() {
@@ -6946,29 +7437,73 @@
         el.textContent = msg || "";
         el.hidden = !msg;
       }
-      function liSyncKindUi() {
+      function liGetImportFile() {
+        if (__liImportFile) return __liImportFile;
+        var fileInput = document.getElementById("leadsImportFile");
+        return fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+      }
+      function liUpdateImportConfirmState() {
+        var btn = document.getElementById("btnLeadsConfirmImport");
+        if (!btn) return;
+        var n = __liParse && __liParse.contacts ? __liParse.contacts.length : 0;
+        btn.disabled = n < 1;
+      }
+      function liStashImportFile(file) {
+        __liImportFile = file || null;
+        __liParse = null;
+      }
+      function liGetUiKind() {
         var radios = document.querySelectorAll('input[name="leadsImportKind"]');
-        var kind = "csv";
         for (var i = 0; i < radios.length; i++) {
-          if (radios[i].checked) { kind = radios[i].value; break; }
+          if (radios[i].checked) return radios[i].value;
         }
+        return "spreadsheet";
+      }
+      function liSyncKindUi() {
+        var kind = liGetUiKind();
         var fileRow = document.getElementById("leadsImportFileRow");
         var pasteRow = document.getElementById("leadsImportPasteRow");
         var fileInput = document.getElementById("leadsImportFile");
         if (!fileRow || !pasteRow || !fileInput) return;
         if (kind === "text") {
-          fileRow.hidden = false; pasteRow.hidden = false;
-          fileInput.accept = ".txt,text/plain";
-        } else if (kind === "excel") {
-          fileRow.hidden = false; pasteRow.hidden = true;
-          fileInput.accept = ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+          fileRow.hidden = false;
+          pasteRow.hidden = false;
+          fileInput.accept = ".csv,.txt,text/csv,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         } else {
-          fileRow.hidden = false; pasteRow.hidden = true;
-          fileInput.accept = ".csv,text/csv";
+          fileRow.hidden = false;
+          pasteRow.hidden = true;
+          fileInput.accept = ".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         }
+      }
+      function liDetectParseKind(file, uiKind) {
+        var note = "";
+        if (!file) {
+          return uiKind === "text" ? {kind: "text", note: ""} : null;
+        }
+        var name = String(file.name || "").toLowerCase();
+        var mime = String(file.type || "").toLowerCase();
+        var isExcel =
+          name.endsWith(".xlsx") ||
+          mime.indexOf("spreadsheetml.sheet") >= 0 ||
+          mime.indexOf("spreadsheetml") >= 0;
+        if (isExcel) {
+          note = "Detected Excel file — parsing as .xlsx";
+          return {kind: "excel", note: note};
+        }
+        if (name.endsWith(".csv")) {
+          return {kind: "csv", note: note};
+        }
+        if (name.endsWith(".txt")) {
+          return {kind: "text", note: "Detected .txt — parsing as text"};
+        }
+        if (uiKind === "spreadsheet") {
+          return {kind: "csv", note: "Unknown extension — trying as CSV"};
+        }
+        return {kind: "text", note: ""};
       }
       function liResetModal() {
         __liParse = null;
+        __liImportFile = null;
         liSetErr("");
         var load = document.getElementById("leadsImportLoading");
         var res = document.getElementById("leadsImportResultBlock");
@@ -6989,6 +7524,7 @@
         if (dz2) { dz2.classList.remove("has-file", "drag-over"); }
         if (dt2) dt2.innerHTML = 'Drop file here or <u>click to browse</u>';
         liSyncKindUi();
+        liUpdateImportConfirmState();
       }
       function liOpenModal(defaultDest) {
         liResetModal();
@@ -7027,31 +7563,35 @@
             "</td><td>" + liEscape(c.email||"") + "</td><td style='color:#eab308'>" + liEscape(w) + "</td>";
           tbody.appendChild(tr);
         }
+        if (!list.length) {
+          liSetErr(
+            "Could not read emails — if this is an Excel file, hard-refresh the page (Ctrl+Shift+R) and drop again."
+          );
+        } else {
+          liSetErr("");
+        }
+        liUpdateImportConfirmState();
       }
       function liRunParse() {
         liSetErr("");
-        var radios = document.querySelectorAll('input[name="leadsImportKind"]');
-        var kind = "csv";
-        for (var i = 0; i < radios.length; i++) {
-          if (radios[i].checked) { kind = radios[i].value; break; }
-        }
+        var uiKind = liGetUiKind();
         var pasteEl = document.getElementById("leadsImportPaste");
         var paste = pasteEl ? pasteEl.value.trim() : "";
-        var fileInput = document.getElementById("leadsImportFile");
-        var file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+        var file = liGetImportFile();
         var loading = document.getElementById("leadsImportLoading");
         var resBlock = document.getElementById("leadsImportResultBlock");
         if (loading) loading.hidden = false;
         if (resBlock) resBlock.hidden = true;
         __liParse = null;
         var tenant = liGetTenant();
+        var detected = liDetectParseKind(file, uiKind);
 
         function liFinishErr(msg) {
           if (loading) loading.hidden = true;
           liSetErr(msg);
         }
 
-        function liDoRequest(payload) {
+        function liDoRequest(payload, detectNote) {
           TJFetch("/api/ai/parse-contacts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -7067,32 +7607,49 @@
                 return;
               }
               var b = x.body;
+              var parseNote = b.parseNote || "";
+              if (detectNote) parseNote = detectNote + (parseNote ? " · " + parseNote : "");
               __liParse = {
                 contacts: b.contacts || [],
-                parseNote: b.parseNote || "",
+                parseNote: parseNote,
                 fileName: b.fileName || (file ? file.name : "paste"),
               };
               liRenderPreview({ contacts: __liParse.contacts, parseNote: __liParse.parseNote, fileName: __liParse.fileName });
               if (resBlock) resBlock.hidden = false;
+              liUpdateImportConfirmState();
             })
             .catch(function (e) { liFinishErr(e.message || String(e)); });
         }
 
+        if (uiKind === "text" && !file && !paste) {
+          liFinishErr("Paste contact text or choose a file.");
+          return;
+        }
+        if (uiKind === "spreadsheet" && !file) {
+          liFinishErr("Choose an Apollo CSV or Excel (.xlsx) file.");
+          return;
+        }
+        if (!detected && uiKind === "spreadsheet") {
+          liFinishErr("Choose an Apollo CSV or Excel (.xlsx) file.");
+          return;
+        }
+
+        var kind = detected ? detected.kind : "text";
+        var detectNote = detected && detected.note ? detected.note : "";
+
         if (kind === "excel") {
-          if (!file) { liFinishErr("Choose an Excel (.xlsx) file."); return; }
           var r = new FileReader();
-          r.onload = function () { liDoRequest({ tenantId: tenant, kind: "excel", fileName: file.name, base64: r.result }); };
+          r.onload = function () { liDoRequest({ tenantId: tenant, kind: "excel", fileName: file.name, base64: r.result }, detectNote); };
           r.onerror = function () { liFinishErr("Could not read file."); };
           r.readAsDataURL(file);
           return;
         }
         if (kind === "csv") {
-          if (!file) { liFinishErr("Upload a CSV file."); return; }
           var r2 = new FileReader();
           r2.onload = function () {
             var t = r2.result;
             if (!t || !String(t).trim()) { liFinishErr("CSV looks empty."); return; }
-            liDoRequest({ tenantId: tenant, kind: "csv", fileName: file.name, text: t });
+            liDoRequest({ tenantId: tenant, kind: "csv", fileName: file.name, text: t }, detectNote);
           };
           r2.onerror = function () { liFinishErr("Could not read file."); };
           r2.readAsText(file);
@@ -7100,7 +7657,7 @@
         }
         function liSendText(text, name) {
           if (!text || !String(text).trim()) { liFinishErr("Paste text or upload a .txt file."); return; }
-          liDoRequest({ tenantId: tenant, kind: "text", fileName: name, text: text });
+          liDoRequest({ tenantId: tenant, kind: "text", fileName: name, text: text }, detectNote);
         }
         if (file) {
           var r3 = new FileReader();
@@ -7113,7 +7670,7 @@
       }
       function liConfirmImport() {
         if (!__liParse || !__liParse.contacts || !__liParse.contacts.length) {
-          liSetErr("Parse contacts first — nothing to import.");
+          liSetErr("Preview import first — nothing to import.");
           return;
         }
         liSetErr("");
@@ -7187,7 +7744,11 @@
 
         if (dropFileInput) {
           dropFileInput.addEventListener("change", function () {
-            if (dropFileInput.files && dropFileInput.files[0]) setLeadsFileName(dropFileInput.files[0].name);
+            if (dropFileInput.files && dropFileInput.files[0]) {
+              liStashImportFile(dropFileInput.files[0]);
+              setLeadsFileName(dropFileInput.files[0].name);
+              requestAnimationFrame(function () { liRunParse(); });
+            }
           });
         }
         if (dropZone) {
@@ -7204,7 +7765,9 @@
               dt.items.add(files[0]);
               dropFileInput.files = dt.files;
             } catch (er) {}
+            liStashImportFile(files[0]);
             setLeadsFileName(files[0].name);
+            requestAnimationFrame(function () { liRunParse(); });
           });
         }
       });
