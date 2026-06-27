@@ -1,25 +1,27 @@
 # Lead Automation Engine
 
-AI-powered B2B lead automation platform built solo during a software engineering internship at TechJump w/ Cursor. The system ingests leads, generates personalized outreach with OpenAI, delivers email through SendGrid, tracks replies, and runs scheduled follow-up sequences. All lead events are logged in Firestore under tenant-scoped paths.
+> AI-powered B2B outreach automation — internship project at TechJump (built with Cursor).
 
-The implementation is rather naive and I am sure it can be significiantly improved. Any contributions or suggestions are welcome :)
+AI-powered lead automation platform: ingest leads, generate personalized outreach with OpenAI, deliver email through SendGrid, track replies, and run scheduled follow-up sequences. All lead events are logged in Firestore under tenant-scoped paths.
 
-## Demo
+🚀 [Live demo](https://tech-jump-outreach.web.app/login.html) · 🎬 [Watch video](https://github.com/arnoldfolarin/lead-automation-engine/releases/download/demo-walkthrough/demo-walkthrough.mp4) · 📐 [Architecture docs](docs/ARCHITECTURE.md)
+
+## 🌐 Demo
 
 **Live app:** https://tech-jump-outreach.web.app/login.html  
 (Sign-in requires a Google account on the allowed domain.)
 
-## Video
+## 🎬 Video
 
 ![Lead automation demo walkthrough](docs/assets/demo-walkthrough.gif)
 
 Full recording (MP4): https://github.com/arnoldfolarin/lead-automation-engine/releases/download/demo-walkthrough/demo-walkthrough.mp4
 
-## Motivation
+## 💡 Motivation
 
 Manual cold outreach does not scale. Sales teams need a system that can accept leads from multiple sources, draft context-aware messages, send on a schedule, and stop when a prospect replies. This project automates that loop while keeping human review in the loop for inbound replies and AI-generated drafts.
 
-## Architecture
+## 📐 Architecture
 
 ```mermaid
 flowchart LR
@@ -67,7 +69,7 @@ flowchart LR
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for component details and Firestore layout.
 
-## Tech stack
+## 🛠️ Tech stack
 
 | Layer | Technology |
 |---|---|
@@ -79,7 +81,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for component details and Fires
 | Dashboard | Firebase Hosting (static HTML/JS) |
 | Data tooling | Python (export, import, reporting) |
 
-## Features
+## ✨ Features
 
 - Multi-tenant Firestore data model (`tenants/{tenantId}/leads`, `targets`)
 - Bulk lead and target import via REST API
@@ -95,13 +97,15 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for component details and Fires
 - Meta Lead Ads ingest adapter module (`ingest/meta/`, separate SMS path)
 - Python scripts for CSV import, export, pipeline reporting, and webhook smoke tests
 
-## Project structure
+## 📁 Project structure
+
+The main deployed app is the **email outreach pipeline** (`functions/` + `public/`). The `ingest/meta/` folder is a separate Meta Lead Ads / SMS adapter module — not yet wired into the main Cloud Functions deployment.
 
 ```
 lead-automation-engine/
 ├── functions/           # Cloud Functions API, sequence worker, email provider
 ├── public/              # Firebase Hosting dashboard UI
-├── ingest/meta/         # Meta Lead Ads webhook adapter
+├── ingest/meta/         # Meta Lead Ads webhook adapter (future SMS path)
 ├── python/              # Data export, import, scoring, and reporting scripts
 ├── docs/                # Architecture and MVP notes
 ├── firebase.json        # Firebase project config
@@ -109,7 +113,7 @@ lead-automation-engine/
 └── .env.example         # Environment variable template
 ```
 
-## How it works
+## ⚙️ How it works
 
 1. **Lead ingestion** - Contacts enter via bulk import API, CSV Python script, or the Meta adapter module. Each record is stored under `tenants/{tenantId}/`.
 2. **AI composition** - When an operator starts outreach or a sequence step is due, OpenAI drafts a personalized email using company context, outreach vibe, and prior touch history.
@@ -119,7 +123,7 @@ lead-automation-engine/
 6. **Follow-up sequences** - A scheduled worker runs every minute, finds due targets, and sends the next sequence step or creates a draft for review.
 7. **Logging** - Pipeline status, touch history, and webhook trace data are written to Firestore for audit and reporting.
 
-## Setup
+## 🔧 Setup
 
 ### Prerequisites
 
@@ -168,7 +172,7 @@ All required keys are listed in [.env.example](.env.example). Never commit real 
 | `FIREBASE_PROJECT_ID` | Firestore access (Python scripts) |
 | `META_WEBHOOK_VERIFY_TOKEN` | Meta adapter webhook verify |
 
-## Future improvements
+## 🔮 Future improvements
 
 - Wire the Meta ingest adapter into the main Cloud Functions deployment
 - LinkedIn conversation ingest adapter
@@ -176,6 +180,8 @@ All required keys are listed in [.env.example](.env.example). Never commit real 
 - Tenant admin UI for API key and sequence configuration
 - Cloud Tasks queue for more reliable sequence scheduling at scale
 
-## License
+Contributions and suggestions welcome — there's plenty of room to improve and harden the implementation.
 
-Private internship project. 
+## 📄 License
+
+Private internship project.
