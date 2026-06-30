@@ -280,12 +280,7 @@
         cursor: pointer;
         text-align: left;
       }
-      .outreach-bulk-toolbar .outreach-folder-move-select {
-        max-width: 11rem;
-        font-size: 0.78rem;
-        margin: 0;
-      }
-      .outreach-bulk-toolbar .btn-outreach-bulk-folder {
+      .outreach-bulk-toolbar .outreach-folder-move__trigger {
         font-size: 0.78rem;
       }
       .sheet-grid .col-inbound-chk,
@@ -2804,6 +2799,7 @@
 
           <div id="leadsImportResultBlock" hidden>
             <p id="leadsImportParseNote" style="font-size:0.78rem;color:var(--muted);margin:0 0 0.5rem"></p>
+            <div id="leadsImportDedupeBanner" hidden></div>
             <div class="limport-preview-wrap">
               <table>
                 <thead id="leadsImportThead"></thead>
@@ -2964,6 +2960,8 @@
     <script src="/js/auth-gate.js"></script>
     <script src="/js/app-gate.js"></script>
     <script src="/js/api-fetch.js"></script>
+    <script src="/js/contact-dedupe.js"></script>
+    <script src="/js/contact-dedupe-ui.js"></script>
     <script src="/js/tj-user-prefs-sync.js"></script>
     <script>
       function __tjAgentLog(location, message, data, hypothesisId) {
@@ -4416,19 +4414,20 @@
 
       function outreachFolderMoveSelectHtml(folders) {
         let html =
-          '<select class="outreach-folder-move-select" id="outreachFolderMoveSelect" aria-label="Move selected to folder">' +
-          '<option value="">Move to folder…</option>' +
-          '<option value="__clear__">Remove from folder</option>';
+          '<div class="outreach-folder-move">' +
+          '<button type="button" class="btn-inbound-send outreach-folder-move__trigger" disabled aria-haspopup="true" aria-expanded="false">Move to folder</button>' +
+          '<div class="outreach-folder-move__menu" hidden role="menu">' +
+          '<button type="button" class="outreach-folder-move__item is-muted" role="menuitem" data-folder-value="__clear__">Remove from folder</button>';
         (folders || []).forEach(function (f) {
           if (!f || !f.id) return;
           html +=
-            '<option value="' +
+            '<button type="button" class="outreach-folder-move__item" role="menuitem" data-folder-value="' +
             escapeHtml(String(f.id)) +
             '">' +
             escapeHtml(String(f.name || "Folder")) +
-            "</option>";
+            "</button>";
         });
-        html += "</select>";
+        html += "</div></div>";
         return html;
       }
 
@@ -4554,11 +4553,7 @@
           sfx +
           '" disabled>Remove selected</button>';
         if (scope !== "pending") {
-          html +=
-            outreachFolderMoveSelectHtml(window.__outreachFoldersList || []) +
-            '<button type="button" class="btn-inbound-send btn-outreach-bulk-folder" id="btnOutreachBulkFolder' +
-            sfx +
-            '" disabled>Move to folder</button>';
+          html += outreachFolderMoveSelectHtml(window.__outreachFoldersList || []);
         }
         html +=
           '<span class="inbound-toolbar-note outreach-toolbar-note" id="outreachToolbarNote' +
@@ -6184,7 +6179,7 @@
         document.querySelectorAll(".outreach-bulk-scope").forEach(function (scopeRoot) {
           const btn = scopeRoot.querySelector(".btn-outreach-bulk-send");
           const btnDel = scopeRoot.querySelector(".btn-outreach-bulk-delete");
-          const btnFolder = scopeRoot.querySelector(".btn-outreach-bulk-folder");
+          const folderTrigger = scopeRoot.querySelector(".outreach-folder-move__trigger");
           const note = scopeRoot.querySelector(".outreach-toolbar-note");
           const selAll = scopeRoot.querySelector(".outreach-select-all");
           if (!btn) return;
@@ -6197,9 +6192,9 @@
             btnDel.disabled = n === 0;
             btnDel.textContent = n ? "Remove selected (" + n + ")" : "Remove selected";
           }
-          if (btnFolder) {
-            btnFolder.disabled = n === 0;
-            btnFolder.textContent = n ? "Move to folder (" + n + ")" : "Move to folder";
+          if (folderTrigger) {
+            folderTrigger.disabled = n === 0;
+            folderTrigger.textContent = n ? "Move to folder (" + n + ")" : "Move to folder";
           }
           if (note) {
             note.textContent =
@@ -6526,6 +6521,19 @@
 
       function bindOutreachBulkClick(rootEl) {
         if (!rootEl) return;
+        if (!window.__outreachFolderMoveDocBound) {
+          window.__outreachFolderMoveDocBound = true;
+          document.addEventListener("click", function (docEv) {
+            if (docEv.target.closest(".outreach-folder-move")) return;
+            document.querySelectorAll(".outreach-folder-move__menu").forEach(function (menu) {
+              menu.hidden = true;
+            });
+            document.querySelectorAll(".outreach-folder-move__trigger.is-open").forEach(function (tr) {
+              tr.classList.remove("is-open");
+              tr.setAttribute("aria-expanded", "false");
+            });
+          });
+        }
         rootEl.addEventListener("click", async function (e) {
         const btnOutreach = e.target.closest(".btn-outreach-bulk-send");
         if (btnOutreach) {
@@ -6547,6 +6555,12 @@
             });
           });
           if (!items.length) return;
+          var deduped = TJContactDedupe.dedupeQueueItems(items);
+          if (deduped.removed > 0) {
+            sessionStorage.setItem("tj_email_bulk_queue_note", JSON.stringify({ removed: deduped.removed }));
+          }
+          items = deduped.items;
+          if (!items.length) { alert("No unique emails selected."); return; }
           try {
             sessionStorage.setItem("tj_email_bulk_queue", JSON.stringify({tenantId: tenant, items: items}));
           } catch (err) {
@@ -6557,17 +6571,46 @@
           return;
         }
 
-        const btnBulkFolder = e.target.closest(".btn-outreach-bulk-folder");
-        if (btnBulkFolder) {
-          if (btnBulkFolder.disabled) return;
-          const scopeRootFolder = btnBulkFolder.closest(".outreach-bulk-scope");
+        const folderTrigger = e.target.closest(".outreach-folder-move__trigger");
+        if (folderTrigger) {
+          if (folderTrigger.disabled) return;
+          e.stopPropagation();
+          const moveWrap = folderTrigger.closest(".outreach-folder-move");
+          const menu = moveWrap ? moveWrap.querySelector(".outreach-folder-move__menu") : null;
+          document.querySelectorAll(".outreach-folder-move").forEach(function (wrap) {
+            if (wrap === moveWrap) return;
+            const otherMenu = wrap.querySelector(".outreach-folder-move__menu");
+            const otherTrigger = wrap.querySelector(".outreach-folder-move__trigger");
+            if (otherMenu) otherMenu.hidden = true;
+            if (otherTrigger) {
+              otherTrigger.classList.remove("is-open");
+              otherTrigger.setAttribute("aria-expanded", "false");
+            }
+          });
+          if (menu) {
+            const open = menu.hidden;
+            menu.hidden = !open;
+            folderTrigger.classList.toggle("is-open", open);
+            folderTrigger.setAttribute("aria-expanded", open ? "true" : "false");
+          }
+          return;
+        }
+
+        const folderItem = e.target.closest(".outreach-folder-move__item");
+        if (folderItem) {
+          const scopeRootFolder = folderItem.closest(".outreach-bulk-scope");
           if (!scopeRootFolder) return;
           const tenantFolder = normalizeTenantInput(document.getElementById("tenantId").value);
-          const selEl = scopeRootFolder.querySelector(".outreach-folder-move-select");
-          const folderVal = selEl ? String(selEl.value || "").trim() : "";
-          if (!folderVal) {
-            alert("Choose a folder from the dropdown first.");
-            return;
+          const folderVal = String(folderItem.getAttribute("data-folder-value") || "").trim();
+          const moveWrap = folderItem.closest(".outreach-folder-move");
+          if (moveWrap) {
+            const menu = moveWrap.querySelector(".outreach-folder-move__menu");
+            const trigger = moveWrap.querySelector(".outreach-folder-move__trigger");
+            if (menu) menu.hidden = true;
+            if (trigger) {
+              trigger.classList.remove("is-open");
+              trigger.setAttribute("aria-expanded", "false");
+            }
           }
           const targetIds = [];
           scopeRootFolder.querySelectorAll(".pipeline-target-chk:checked").forEach(function (cb) {
@@ -6576,7 +6619,8 @@
           });
           if (!targetIds.length) return;
           const outreachFolderId = folderVal === "__clear__" ? null : folderVal;
-          btnBulkFolder.disabled = true;
+          const folderTriggerBtn = moveWrap ? moveWrap.querySelector(".outreach-folder-move__trigger") : null;
+          if (folderTriggerBtn) folderTriggerBtn.disabled = true;
           try {
             const res = await TJFetch("/api/targets/bulk-folder", {
               method: "POST",
@@ -6597,7 +6641,8 @@
           } catch (err) {
             alert(err && err.message ? err.message : String(err));
           } finally {
-            btnBulkFolder.disabled = false;
+            if (folderTriggerBtn) folderTriggerBtn.disabled = false;
+            updateOutreachToolbarState();
           }
           return;
         }
@@ -7442,11 +7487,51 @@
         var fileInput = document.getElementById("leadsImportFile");
         return fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
       }
+      function liGetImportDest() {
+        var destRadios = document.querySelectorAll('input[name="leadsImportDest"]');
+        for (var i = 0; i < destRadios.length; i++) {
+          if (destRadios[i].checked) return destRadios[i].value;
+        }
+        return __liDefaultDest || "outreach";
+      }
+      function liGetImportExistingEmails() {
+        if (liGetImportDest() !== "outreach") return null;
+        var targets = window.__pipelineTargetsList || [];
+        return TJContactDedupe.buildExistingEmailSetFromTargets(targets);
+      }
+      function liApplyImportDedupeAction(action) {
+        if (!__liParse || !__liParse.contacts) return;
+        var existing = liGetImportExistingEmails();
+        if (action === "within") {
+          __liParse.contacts = TJContactDedupe.dedupeWithinBatch(__liParse.contacts, "first");
+        } else if (action === "pipeline") {
+          __liParse.contacts = TJContactDedupe.removePipelineOverlaps(__liParse.contacts, existing);
+        } else if (action === "all") {
+          __liParse.contacts = TJContactDedupe.removeAllFlagged(__liParse.contacts, existing);
+        }
+        liRenderPreview({
+          contacts: __liParse.contacts,
+          parseNote: __liParse.parseNote,
+          fileName: __liParse.fileName,
+        });
+      }
+      function liRemoveImportRow(idx) {
+        if (!__liParse || !__liParse.contacts) return;
+        __liParse.contacts = TJContactDedupe.removeIndices(__liParse.contacts, [idx]);
+        liRenderPreview({
+          contacts: __liParse.contacts,
+          parseNote: __liParse.parseNote,
+          fileName: __liParse.fileName,
+        });
+      }
       function liUpdateImportConfirmState() {
         var btn = document.getElementById("btnLeadsConfirmImport");
         if (!btn) return;
-        var n = __liParse && __liParse.contacts ? __liParse.contacts.length : 0;
+        var contacts = __liParse && __liParse.contacts ? __liParse.contacts : [];
+        var n = contacts.length;
         btn.disabled = n < 1;
+        var analysis = n ? TJContactDedupe.analyzeContacts(contacts, liGetImportExistingEmails()) : null;
+        btn.textContent = TJContactDedupeUi.importConfirmLabel(n, analysis);
       }
       function liStashImportFile(file) {
         __liImportFile = file || null;
@@ -7550,19 +7635,63 @@
         if (note) note.innerHTML = parts.join(" &nbsp;·&nbsp; ");
         var thead = document.getElementById("leadsImportThead");
         var tbody = document.getElementById("leadsImportTbody");
+        var bannerEl = document.getElementById("leadsImportDedupeBanner");
         if (!thead || !tbody) return;
-        thead.innerHTML = "<tr><th>First</th><th>Last</th><th>Title</th><th>Company</th><th>Email</th><th>Warnings</th></tr>";
-        tbody.innerHTML = "";
         var list = data.contacts || [];
+        var existing = liGetImportExistingEmails();
+        var analysis = list.length ? TJContactDedupe.analyzeContacts(list, existing) : null;
+        thead.innerHTML =
+          "<tr><th>First</th><th>Last</th><th>Title</th><th>Company</th><th>Email</th><th>Warnings</th><th></th></tr>";
+        tbody.innerHTML = "";
         for (var i = 0; i < list.length; i++) {
           var c = list[i];
           var w = Array.isArray(c.warnings) ? c.warnings.join("; ") : "";
+          var rowMeta = analysis && analysis.rows[i] ? analysis.rows[i] : null;
+          var dupBits = [];
+          if (rowMeta && rowMeta.isExtraWithin) dupBits.push("Duplicate in file");
+          if (rowMeta && rowMeta.onPipeline) dupBits.push("Already on Pipeline");
+          if (dupBits.length) w = (w ? w + "; " : "") + dupBits.join("; ");
           var tr = document.createElement("tr");
-          tr.innerHTML = "<td>" + liEscape(c.firstName||"") + "</td><td>" + liEscape(c.lastName||"") +
-            "</td><td>" + liEscape(c.title||"") + "</td><td>" + liEscape(c.companyName||"") +
-            "</td><td>" + liEscape(c.email||"") + "</td><td style='color:#eab308'>" + liEscape(w) + "</td>";
+          tr.setAttribute("data-import-idx", String(i));
+          var removeCell = "";
+          if (rowMeta && (rowMeta.isExtraWithin || rowMeta.onPipeline)) {
+            removeCell =
+              '<td><button type="button" class="import-row-remove-btn" data-remove-import-row="' +
+              i +
+              '">Remove</button></td>';
+          } else {
+            removeCell = "<td></td>";
+          }
+          tr.innerHTML =
+            "<td>" +
+            liEscape(c.firstName || "") +
+            "</td><td>" +
+            liEscape(c.lastName || "") +
+            "</td><td>" +
+            liEscape(c.title || "") +
+            "</td><td>" +
+            liEscape(c.companyName || "") +
+            "</td><td>" +
+            liEscape(c.email || "") +
+            "</td><td style='color:#eab308'>" +
+            liEscape(w) +
+            "</td>" +
+            removeCell;
           tbody.appendChild(tr);
         }
+        if (analysis) {
+          TJContactDedupeUi.applyImportRowFlags(tbody, analysis);
+          TJContactDedupeUi.renderImportDedupeBanner(bannerEl, analysis, liApplyImportDedupeAction);
+        } else if (bannerEl) {
+          bannerEl.innerHTML = "";
+          bannerEl.hidden = true;
+        }
+        tbody.onclick = function (ev) {
+          var rm = ev.target.closest("[data-remove-import-row]");
+          if (!rm) return;
+          var idx = parseInt(rm.getAttribute("data-remove-import-row") || "-1", 10);
+          if (idx >= 0) liRemoveImportRow(idx);
+        };
         if (!list.length) {
           liSetErr(
             "Could not read emails — if this is an Excel file, hard-refresh the page (Ctrl+Shift+R) and drop again."

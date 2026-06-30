@@ -2625,6 +2625,7 @@
               <button type="button" class="btn-pipeline-pick" id="btnPipelinePick">+ Add from Pipeline</button>
             </div>
             <div class="email-recipient-chips" id="emailRecipientChips" aria-live="polite"></div>
+            <div id="emailQueueDedupeBanner" hidden></div>
             <p class="recipient-hint" id="recipientHint">Their email address, or add people from Pipeline as chips above.</p>
             <input id="testTo" type="email" placeholder="name@company.com" autocomplete="email" />
           </div>
@@ -3191,6 +3192,8 @@
     <script src="/js/auth-gate.js"></script>
     <script src="/js/app-gate.js"></script>
     <script src="/js/api-fetch.js"></script>
+    <script src="/js/contact-dedupe.js"></script>
+    <script src="/js/contact-dedupe-ui.js"></script>
     <script src="/js/email-templates.js"></script>
     <script src="/js/outreach-autofill.js"></script>
     <script src="/js/tj-user-prefs-sync.js"></script>
@@ -4006,6 +4009,7 @@
       var autoLinkDebounceTimer = null;
       /** [{ targetId, email, companyName, directorName, campaignName, city, outreachVibe }] */
       var emailBulkQueue = null;
+      var __queueDedupeExtraMessage = "";
       var __userDefaultOutreachVibe = "";
 
       function getDefaultOutreachVibeText() {
@@ -4073,16 +4077,52 @@
         return "No campaign";
       }
 
+      function refreshQueueDedupeUi() {
+        var banner = document.getElementById("emailQueueDedupeBanner");
+        if (!banner || !window.TJContactDedupeUi || !window.TJContactDedupe) return;
+        var analysis =
+          emailBulkQueue && emailBulkQueue.length
+            ? TJContactDedupe.analyzeQueueItems(emailBulkQueue)
+            : null;
+        TJContactDedupeUi.renderQueueDedupeBanner(
+          banner,
+          analysis,
+          function () {
+            if (!emailBulkQueue || !emailBulkQueue.length) return;
+            var deduped = TJContactDedupe.dedupeQueueItems(emailBulkQueue);
+            emailBulkQueue = deduped.items.length ? deduped.items : null;
+            __queueDedupeExtraMessage = "";
+            if (!emailBulkQueue) {
+              clearSendListFields();
+            } else {
+              applyEmailBulkIndex();
+            }
+            syncSendListUi();
+          },
+          __queueDedupeExtraMessage
+        );
+      }
+
       function renderRecipientChips() {
         var wrap = document.getElementById("emailRecipientChips");
         if (!wrap) return;
         wrap.innerHTML = "";
         if (!emailBulkQueue || !emailBulkQueue.length) return;
+        var queueAnalysis =
+          window.TJContactDedupe && emailBulkQueue.length
+            ? TJContactDedupe.analyzeQueueItems(emailBulkQueue)
+            : null;
         for (var i = 0; i < emailBulkQueue.length; i++) {
           (function (idx) {
             var it = emailBulkQueue[idx];
             var chip = document.createElement("span");
             chip.className = "email-recipient-chip" + (idx === 0 ? " is-active" : "");
+            if (
+              window.TJContactDedupeUi &&
+              TJContactDedupeUi.queueChipIsDuplicate(queueAnalysis, idx)
+            ) {
+              chip.classList.add("is-dup");
+            }
             chip.title =
               (it.directorName ? it.directorName + " · " : "") + (it.companyName || it.email || "");
             var emailSpan = document.createElement("span");
@@ -4124,6 +4164,7 @@
           if (note) note.hidden = false;
           if (sendAllBtn) sendAllBtn.hidden = true;
           renderRecipientChips();
+          refreshQueueDedupeUi();
           return;
         }
         bar.hidden = false;
@@ -4133,6 +4174,7 @@
         txt.textContent = " · 1 of " + n + " · " + co + " · " + (cur.email || "");
         if (sendAllBtn) sendAllBtn.hidden = n <= 1;
         renderRecipientChips();
+        refreshQueueDedupeUi();
       }
 
       function focusQueueIndex(idx) {
@@ -4173,6 +4215,7 @@
 
       function clearSendList() {
         emailBulkQueue = null;
+        __queueDedupeExtraMessage = "";
         try {
           sessionStorage.removeItem("tj_inbound_send_queue");
         } catch (_) {}
@@ -4189,10 +4232,11 @@
       }
 
       function mergeIntoBulkQueue(items) {
-        if (!items || !items.length) return 0;
+        if (!items || !items.length) return {added: 0, skipped: 0};
         if (!emailBulkQueue) emailBulkQueue = [];
         var hadQueue = emailBulkQueue.length > 0;
         var added = 0;
+        var skipped = 0;
         for (var i = 0; i < items.length; i++) {
           var it = items[i];
           if (!it.email || String(it.email).indexOf("@") === -1) continue;
@@ -4211,15 +4255,21 @@
               break;
             }
           }
-          if (dup) continue;
+          if (dup) {
+            skipped++;
+            continue;
+          }
           emailBulkQueue.push(it);
           added++;
+        }
+        if (added > 0 || skipped > 0) {
+          __queueDedupeExtraMessage = "Added " + added + " · Skipped " + skipped;
         }
         if (!hadQueue && emailBulkQueue.length) {
           applyEmailBulkIndex();
         }
         syncSendListUi();
-        return added;
+        return {added: added, skipped: skipped};
       }
 
       function loadInboundSendQueue() {
@@ -4688,9 +4738,9 @@
           alert("Select at least one pipeline contact.");
           return;
         }
-        var added = mergeIntoBulkQueue(items);
+        var mergeResult = mergeIntoBulkQueue(items);
         closePipelinePickerModal();
-        if (added === 0) {
+        if (mergeResult.added === 0) {
           alert("Those contacts are already on your send list.");
         }
       }
@@ -4743,6 +4793,21 @@
 
       function initEmailBulkFromSession() {
         try {
+          var noteRaw = sessionStorage.getItem("tj_email_bulk_queue_note");
+          if (noteRaw) {
+            try {
+              var note = JSON.parse(noteRaw);
+              if (note && note.removed > 0) {
+                __queueDedupeExtraMessage =
+                  "Skipped " +
+                  note.removed +
+                  " duplicate email" +
+                  (note.removed === 1 ? "" : "s") +
+                  " from selection.";
+              }
+            } catch (_) {}
+            sessionStorage.removeItem("tj_email_bulk_queue_note");
+          }
           var raw = sessionStorage.getItem("tj_email_bulk_queue");
           if (!raw) return;
           var data = JSON.parse(raw);

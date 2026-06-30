@@ -1381,6 +1381,7 @@
           </div>
           <div id="importResultBlock" hidden>
             <p class="muted" id="importParseNote" style="font-size: 0.8rem"></p>
+            <div id="importDedupeBanner" hidden></div>
             <div class="import-preview-wrap">
               <table>
                 <thead id="importThead"></thead>
@@ -1401,6 +1402,8 @@
     <script src="/js/auth-gate.js"></script>
     <script src="/js/app-gate.js"></script>
     <script src="/js/api-fetch.js"></script>
+    <script src="/js/contact-dedupe.js"></script>
+    <script src="/js/contact-dedupe-ui.js"></script>
     <script src="/js/tj-user-prefs-sync.js"></script>
     <script src="/shell.js"></script>
     <script>
@@ -1512,11 +1515,51 @@
           var fileInput = document.getElementById("importFile");
           return fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
         }
+        function getImportDest() {
+          var destR = document.querySelectorAll('input[name="importDest"]');
+          for (var i = 0; i < destR.length; i++) {
+            if (destR[i].checked) return destR[i].value;
+          }
+          return "inbound";
+        }
+        function getImportExistingEmails() {
+          if (getImportDest() !== "outreach") return null;
+          var targets = (__bubbleState && __bubbleState.targets) || [];
+          return TJContactDedupe.buildExistingEmailSetFromTargets(targets);
+        }
+        function applyImportDedupeAction(action) {
+          if (!__importParse || !__importParse.contacts) return;
+          var existing = getImportExistingEmails();
+          if (action === "within") {
+            __importParse.contacts = TJContactDedupe.dedupeWithinBatch(__importParse.contacts, "first");
+          } else if (action === "pipeline") {
+            __importParse.contacts = TJContactDedupe.removePipelineOverlaps(__importParse.contacts, existing);
+          } else if (action === "all") {
+            __importParse.contacts = TJContactDedupe.removeAllFlagged(__importParse.contacts, existing);
+          }
+          renderImportPreview({
+            contacts: __importParse.contacts,
+            parseNote: __importParse.parseNote,
+            fileName: __importParse.fileName,
+          });
+        }
+        function removeImportRow(idx) {
+          if (!__importParse || !__importParse.contacts) return;
+          __importParse.contacts = TJContactDedupe.removeIndices(__importParse.contacts, [idx]);
+          renderImportPreview({
+            contacts: __importParse.contacts,
+            parseNote: __importParse.parseNote,
+            fileName: __importParse.fileName,
+          });
+        }
         function updateImportConfirmState() {
           var btn = document.getElementById("btnConfirmImport");
           if (!btn) return;
-          var n = __importParse && __importParse.contacts ? __importParse.contacts.length : 0;
+          var contacts = __importParse && __importParse.contacts ? __importParse.contacts : [];
+          var n = contacts.length;
           btn.disabled = n < 1;
+          var analysis = n ? TJContactDedupe.analyzeContacts(contacts, getImportExistingEmails()) : null;
+          btn.textContent = TJContactDedupeUi.importConfirmLabel(n, analysis);
         }
         function stashImportFile(file) {
           __importFile = file || null;
@@ -1653,15 +1696,33 @@
           if (note) note.innerHTML = parts.join("<br>");
           var thead = document.getElementById("importThead");
           var tbody = document.getElementById("importTbody");
+          var bannerEl = document.getElementById("importDedupeBanner");
           if (!thead || !tbody) return;
-          thead.innerHTML =
-            "<tr><th>First</th><th>Last</th><th>Title</th><th>Company</th><th>Email</th><th>Warnings</th></tr>";
-          tbody.innerHTML = "";
           var list = data.contacts || [];
+          var existing = getImportExistingEmails();
+          var analysis = list.length ? TJContactDedupe.analyzeContacts(list, existing) : null;
+          thead.innerHTML =
+            "<tr><th>First</th><th>Last</th><th>Title</th><th>Company</th><th>Email</th><th>Warnings</th><th></th></tr>";
+          tbody.innerHTML = "";
           for (var i = 0; i < list.length; i++) {
             var c = list[i];
             var w = Array.isArray(c.warnings) ? c.warnings.join("; ") : "";
+            var rowMeta = analysis && analysis.rows[i] ? analysis.rows[i] : null;
+            var dupBits = [];
+            if (rowMeta && rowMeta.isExtraWithin) dupBits.push("Duplicate in file");
+            if (rowMeta && rowMeta.onPipeline) dupBits.push("Already on Pipeline");
+            if (dupBits.length) w = (w ? w + "; " : "") + dupBits.join("; ");
             var tr = document.createElement("tr");
+            tr.setAttribute("data-import-idx", String(i));
+            var removeCell = "";
+            if (rowMeta && (rowMeta.isExtraWithin || rowMeta.onPipeline)) {
+              removeCell =
+                '<td><button type="button" class="import-row-remove-btn" data-remove-import-row="' +
+                i +
+                '">Remove</button></td>';
+            } else {
+              removeCell = "<td></td>";
+            }
             tr.innerHTML =
               "<td>" +
               escapeHtml(c.firstName || "") +
@@ -1675,9 +1736,23 @@
               escapeHtml(c.email || "") +
               "</td><td>" +
               escapeHtml(w) +
-              "</td>";
+              "</td>" +
+              removeCell;
             tbody.appendChild(tr);
           }
+          if (analysis) {
+            TJContactDedupeUi.applyImportRowFlags(tbody, analysis);
+            TJContactDedupeUi.renderImportDedupeBanner(bannerEl, analysis, applyImportDedupeAction);
+          } else if (bannerEl) {
+            bannerEl.innerHTML = "";
+            bannerEl.hidden = true;
+          }
+          tbody.onclick = function (ev) {
+            var rm = ev.target.closest("[data-remove-import-row]");
+            if (!rm) return;
+            var idx = parseInt(rm.getAttribute("data-remove-import-row") || "-1", 10);
+            if (idx >= 0) removeImportRow(idx);
+          };
           if (!list.length) {
             setImportErr(
               "Could not read emails — if this is an Excel file, hard-refresh the page (Ctrl+Shift+R) and drop again."
